@@ -1,0 +1,55 @@
+package gaefire
+
+import (
+	"crypto/rsa"
+	"golang.org/x/net/context"
+)
+
+/**
+ * Firebaseのサービスアカウントを定義する。
+ *
+ * 下記の機能を提供する:
+ * * JWT生成
+ * * JWT検証
+ * * サービスアカウントのOAuthトークン生成・リフレッシュ
+ */
+type FirebaseServiceAccount interface {
+	/**
+	 * GCP Project IDを取得する
+	 */
+	GetProjectId() string
+
+	/**
+	 * Service Accountのメールアドレスを取得する
+	 */
+	GetAccountEmail() string
+
+	/**
+	 * 署名のためのPrivate Keyを取得する
+	 */
+	GetPrivateKey() *rsa.PrivateKey
+
+	/**
+	 * JWT署名検証のために公開鍵を検索する。
+	 *
+	 * デフォルトではServiceAccountsの公開鍵、もしくはGoogleの公開鍵を検索する
+	 */
+	FindPublicKey(ctx context.Context, kid string) (*rsa.PublicKey, error)
+
+	/**
+	 * ユーザー名を指定し、JWTの生成を開始する
+	 *
+	 * Firebase用に生成する場合、userUniqueIdは[1-36文字の英数]である必要がある。
+	 */
+	NewFirebaseAuthTokenGenerator(userUniqueId string) JsonWebTokenGenerator
+
+	/**
+	 * Json Web TokenのVerifyオブジェクトを生成する
+	 */
+	NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) JsonWebTokenVerifier
+
+	/**
+	 * Service Accountとして認証するためのOAuth2トークンを取得する
+	 */
+	GetServiceAccountToken() (OAuth2Token, error)
+}
