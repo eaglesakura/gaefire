@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/dgrijalva/jwt-go"
 	"fmt"
+	"errors"
 )
 
 type VerifiedJsonWebTokenImpl struct {
@@ -23,24 +24,22 @@ func (it *VerifiedJsonWebTokenImpl)GetProjectId() (string, error) {
 	if err != nil {
 		return "", err
 	} else {
-		return result, nil
+		return fmt.Sprintf("%v", result), nil
 	}
 }
 
 func (it *VerifiedJsonWebTokenImpl)GetClaim(key string) (interface{}, error) {
-	result, err := it.token.Claims.(jwt.MapClaims)[key]
-	if err != nil {
-		return nil, err
+	if result, ok := it.token.Claims.(jwt.MapClaims)[key]; !ok {
+		return nil, errors.New(fmt.Sprintf("NotFound[%v]", key))
 	} else {
 		return result, nil
 	}
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetHeader(key string, def string) string {
-	result, ok := it.token.Header[key]
-	if !ok {
-		return def
+func (it *VerifiedJsonWebTokenImpl)GetHeader(key string) (interface{}, error) {
+	if result, ok := it.token.Header[key]; !ok {
+		return nil, errors.New(fmt.Sprintf("NotFound[%v]", key))
 	} else {
-		return result.(string)
+		return result, nil
 	}
 }

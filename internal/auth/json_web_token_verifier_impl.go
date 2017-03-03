@@ -74,9 +74,9 @@ func (it *JsonWebTokenVerifierImpl)SkipProjectId() gaefire.JsonWebTokenVerifier 
 /**
  * 全てのオプションに対し、有効であることが確認できればtrue
  */
-func (it *JsonWebTokenVerifierImpl)Verify(jwtToken string) (gaefire.VerifiedJsonWebToken, error) {
+func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error) {
 	// parse & verify
-	rawToken, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
+	rawToken, err := jwt.Parse(it.token, func(token *jwt.Token) (interface{}, error) {
 		kid := token.Header["kid"].(string)
 		if kid == "" {
 			return nil, errors.New("NotFound kid")

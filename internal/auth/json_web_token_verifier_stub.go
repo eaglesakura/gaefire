@@ -36,7 +36,7 @@ func (it *JsonWebTokenVerifierStubImpl)SkipProjectId() gaefire.JsonWebTokenVerif
 /**
  * 全てのオプションに対し、有効であることが確認できればtrue
  */
-func (it *JsonWebTokenVerifierStubImpl)Verify(jwtToken string) (gaefire.VerifiedJsonWebToken, error) {
+func (it *JsonWebTokenVerifierStubImpl)Valid() (gaefire.VerifiedJsonWebToken, error) {
 	return nil, errors.New("Error Verified")
 
 }

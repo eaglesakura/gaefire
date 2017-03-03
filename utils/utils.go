@@ -1,10 +1,7 @@
 package gaefire
 
 import (
-	"fmt"
 	"os"
-	"errors"
-	"appengine_internal/gopkg.in/yaml.v2"
 	"github.com/eaglesakura/gaefire/assets"
 	"net/http"
 	"encoding/json"
@@ -17,17 +14,6 @@ const (
 	EnvWorkspace = "WORKSPACE"
 )
 
-// find string by map
-// NotFound => ""
-func FindStringValue(values *map[string]interface{}, key string) string {
-	result, ok := (*values)[key]
-	if !ok {
-		return ""
-	} else {
-		return fmt.Sprintf("%v", result)
-	}
-}
-
 func UnmarshalJson(resp *http.Response, result interface{}) error {
 	buf, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -35,14 +21,6 @@ func UnmarshalJson(resp *http.Response, result interface{}) error {
 	}
 
 	return json.Unmarshal(buf, result)
-}
-
-func UnmarshalYaml(asset gaefire.AssetManager, path string, result interface{}) error {
-	buf, _ := asset.LoadFile(path)
-	if buf == nil {
-		return errors.New(fmt.Sprintf("Asset[%s] load failed", path))
-	}
-	return yaml.Unmarshal(buf, result)
 }
 
 // 環境変数を取得する
@@ -62,4 +40,9 @@ func GenMD5(text string) string {
 	hash := md5.New()
 	hash.Write([]byte(text))
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+func LoadFileOrNil(assets gaefire.AssetManager, path string) []byte {
+	buf, _ := assets.LoadFile(path)
+	return buf
 }

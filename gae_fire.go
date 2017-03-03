@@ -7,11 +7,6 @@ import (
 
 type GaeFire interface {
 	/**
-	 * 初期化を行なう
-	 */
-	Initialize() error
-
-	/**
 	 * AssetManagerを生成する
 	 */
 	NewAssetManager() fire_assets.AssetManager

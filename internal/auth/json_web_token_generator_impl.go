@@ -29,7 +29,7 @@ type JsonWebTokenGeneratorImpl struct {
 /**
  * creamを登録する
  */
-func (it *JsonWebTokenGeneratorImpl)AddClaim(key string, value interface{}) (*gaefire.JsonWebTokenGenerator) {
+func (it *JsonWebTokenGeneratorImpl)AddClaim(key string, value interface{}) gaefire.JsonWebTokenGenerator {
 	if it.lastError == nil {
 		it.source.Claims[key] = fmt.Sprintf("%v", value)
 	}
@@ -41,7 +41,7 @@ func (it *JsonWebTokenGeneratorImpl)AddClaim(key string, value interface{}) (*ga
  *
  * ex) AddClaim("kid", "your.private.key.id");
  */
-func (it *JsonWebTokenGeneratorImpl)AddHeader(key string, value interface{}) (*gaefire.JsonWebTokenGenerator) {
+func (it *JsonWebTokenGeneratorImpl)AddHeader(key string, value interface{}) gaefire.JsonWebTokenGenerator {
 	if it.lastError != nil {
 		return it
 	}

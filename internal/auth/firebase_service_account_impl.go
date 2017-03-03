@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
+	"google.golang.org/appengine/log"
 )
 
 const (
@@ -53,7 +54,7 @@ type FirebaseServiceAccountImpl struct {
 
 func NewFirebaseServiceAccount(jsonBuf []byte) gaefire.FirebaseServiceAccount {
 	if jsonBuf == nil {
-		return errors.New("NotFound")
+		panic(errors.New("NotFound"))
 	}
 
 	result := &FirebaseServiceAccountImpl{
@@ -61,25 +62,26 @@ func NewFirebaseServiceAccount(jsonBuf []byte) gaefire.FirebaseServiceAccount {
 	}
 
 	if json.Unmarshal(jsonBuf, &result.rawServiceAccount) != nil {
-		return errors.New("Json parse failed")
+		panic(errors.New("Json parse failed"))
 	}
 
 	if privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(result.rawServiceAccount.PrivateKey)); err == nil {
 		result.privateKey = privateKey
 	} else {
-		return nil
+		panic(errors.New("Private key error"))
 	}
 
 	if keystore := NewPublicKeystore(GooglePublicKeystoreAccount); keystore != nil {
 		result.googlePublicKeys = keystore
 	} else {
-		return nil
+		panic(errors.New("Google Public key error"))
 	}
 	if keystore := NewPublicKeystore(result.rawServiceAccount.ClientEmail); keystore != nil {
 		result.firebasePublicKeys = keystore
 	} else {
-		return nil
+		panic(errors.New("Firebase PUblic key error"))
 	}
+	return result
 }
 
 /**
@@ -112,12 +114,12 @@ func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid stri
 
 	// Google公開鍵を探す
 	if key, err := it.googlePublicKeys.FindPublicKey(kid); err == nil {
-		return key
+		return key, nil
 	}
 
 	// Firebase公開鍵を探す
 	if key, err := it.firebasePublicKeys.FindPublicKey(kid); err == nil {
-		return key
+		return key, nil
 	}
 
 	// Google公開鍵をリフレッシュして探す
@@ -125,7 +127,7 @@ func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid stri
 		return nil, err
 	}
 	if key, err := it.googlePublicKeys.FindPublicKey(kid); err == nil {
-		return key
+		return key, nil
 	}
 
 
@@ -134,9 +136,10 @@ func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid stri
 		return nil, err
 	}
 	if key, err := it.firebasePublicKeys.FindPublicKey(kid); err == nil {
-		return key
+		return key, nil
 	}
 
+	log.Errorf(ctx, fmt.Sprintf("Not Found Keystore[%v]", kid))
 	return nil, errors.New(fmt.Sprintf("Not Found Keystore[%v]", kid))
 }
 

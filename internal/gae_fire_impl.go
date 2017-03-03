@@ -5,7 +5,10 @@ import (
 	"github.com/eaglesakura/gaefire/utils"
 	util "github.com/eaglesakura/gaefire/utils"
 	fire_auth "github.com/eaglesakura/gaefire/auth"
-	"github.com/eaglesakura/gaefire/internal/auth"
+	fire_auth_internal "github.com/eaglesakura/gaefire/internal/auth"
+
+	fire_assets "github.com/eaglesakura/gaefire/assets"
+	fire_assets_internal "github.com/eaglesakura/gaefire/internal/assets"
 )
 
 type GaeFireImpl struct {
@@ -24,8 +27,15 @@ func (it *GaeFireImpl)Initialize() error {
 	return nil;
 }
 
+/**
+ * AssetManagerを生成する
+ */
+func (it *GaeFireImpl)NewAssetManager() fire_assets.AssetManager {
+	return &fire_assets_internal.AssetManagerImpl{}
+}
+
 func (it *GaeFireImpl)NewServiceAccount(jsonBuf []byte) fire_auth.FirebaseServiceAccount {
-	return internal.NewFirebaseServiceAccount(jsonBuf)
+	return fire_auth_internal.NewFirebaseServiceAccount(jsonBuf)
 }
 
 /**
@@ -33,5 +43,5 @@ func (it *GaeFireImpl)NewServiceAccount(jsonBuf []byte) fire_auth.FirebaseServic
  */
 
 func (it *GaeFireImpl)NewWebApplication(jsonBuf []byte) fire_auth.FirebaseWebApplication {
-	return internal.NewFirebaseWebApplication(jsonBuf)
+	return fire_auth_internal.NewFirebaseWebApplication(jsonBuf)
 }

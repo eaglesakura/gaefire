@@ -71,7 +71,7 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (fire_auth.OAuth2Token, 
 
 	jwtToken, _ := gen.Generate()
 	if jwtToken == "" {
-		return errors.New("JwtToken Generate failed")
+		return fire_auth.OAuth2Token{}, errors.New("JwtToken Generate failed")
 	}
 
 	// fetch
@@ -137,7 +137,7 @@ func (it *OAuth2RefreshRequest)_newUserOauth2Token() (fire_auth.OAuth2Token, err
 
 	if !token.Valid(it.ctx) {
 		// 何らかの原因でToken検証に失敗した
-		return errors.New("OAuth2 token validate error.")
+		return fire_auth.OAuth2Token{}, errors.New("OAuth2 token validate error.")
 	}
 
 	return token, nil
