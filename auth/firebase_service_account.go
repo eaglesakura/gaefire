@@ -49,7 +49,15 @@ type FirebaseServiceAccount interface {
 	NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) JsonWebTokenVerifier
 
 	/**
-	 * Service Accountとして認証するためのOAuth2トークンを取得する
+	 * Json Web TokenのVerifyオブジェクトを生成する
+	 * Google Play Service:Authによって認証されたトークンはGoogle経由でVerifyを行なうほうが効率的
 	 */
-	GetServiceAccountToken() (OAuth2Token, error)
+	NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) JsonWebTokenVerifier
+
+	/**
+	 * Service Accountとして認証するためのOAuth2トークンを取得する
+	 *
+	 * OAuth2トークンはMemcacheにキャッシュされ、再取得は最低限となるよう実装される。
+	 */
+	GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (OAuth2Token, error)
 }

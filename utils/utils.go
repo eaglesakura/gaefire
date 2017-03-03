@@ -5,12 +5,16 @@ import (
 	"os"
 	"errors"
 	"appengine_internal/gopkg.in/yaml.v2"
-	assets "github.com/eaglesakura/gaefire/assets"
+	"github.com/eaglesakura/gaefire/assets"
+	"net/http"
+	"encoding/json"
+	"io/ioutil"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 const (
 	EnvWorkspace = "WORKSPACE"
-	GooglePublicKeystoreAccount = "securetoken@system.gserviceaccount.com"
 )
 
 // find string by map
@@ -24,7 +28,16 @@ func FindStringValue(values *map[string]interface{}, key string) string {
 	}
 }
 
-func UnmarshalYaml(asset assets.AssetManager, path string, result interface{}) error {
+func UnmarshalJson(resp *http.Response, result interface{}) error {
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(buf, result)
+}
+
+func UnmarshalYaml(asset gaefire.AssetManager, path string, result interface{}) error {
 	buf, _ := asset.LoadFile(path)
 	if buf == nil {
 		return errors.New(fmt.Sprintf("Asset[%s] load failed", path))
@@ -40,4 +53,13 @@ func GetEnv(key string, def string) string {
 	} else {
 		return value;
 	}
+}
+
+/**
+ * 文字列をMD5に変換する
+ */
+func GenMD5(text string) string {
+	hash := md5.New()
+	hash.Write([]byte(text))
+	return hex.EncodeToString(hash.Sum(nil))
 }

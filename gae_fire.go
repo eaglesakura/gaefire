@@ -5,11 +5,6 @@ import (
 	fire_auth"github.com/eaglesakura/gaefire/auth"
 )
 
-const (
-	EnvWorkspace = "WORKSPACE"
-	GooglePublicKeystoreAccount = "securetoken@system.gserviceaccount.com"
-)
-
 type GaeFire interface {
 	/**
 	 * 初期化を行なう
@@ -25,5 +20,10 @@ type GaeFire interface {
 	 * サービスアカウントを生成する
 	 */
 	NewServiceAccount(jsonBuf []byte) fire_auth.FirebaseServiceAccount
+
+	/**
+	 * ユーザーOAuth2認証に利用するWebアプリケーションを生成する
+	 */
+	NewWebApplication(jsonBuf []byte) fire_auth.FirebaseWebApplication
 }
 

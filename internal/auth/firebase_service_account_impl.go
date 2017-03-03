@@ -8,6 +8,13 @@ import (
 	"time"
 	"fmt"
 	"errors"
+	"encoding/json"
+	"google.golang.org/appengine/urlfetch"
+	"io/ioutil"
+)
+
+const (
+	GooglePublicKeystoreAccount = "securetoken@system.gserviceaccount.com"
 )
 /**
  * service-account.jsonからロードしたサービスアカウント情報を定義する
@@ -21,6 +28,7 @@ type ServiceAccountModel struct {
 	ClientX509CertUrl string `json:"client_x509_cert_url,omitempty"`
 }
 
+// impl FirebaseServiceAccount
 type FirebaseServiceAccountImpl struct {
 	/**
 	 * JSONをデコードしたそのままのデータ
@@ -41,6 +49,37 @@ type FirebaseServiceAccountImpl struct {
 	 * Firebase公開鍵キャッシュ
 	 */
 	firebasePublicKeys *PublicKeystore
+}
+
+func NewFirebaseServiceAccount(jsonBuf []byte) gaefire.FirebaseServiceAccount {
+	if jsonBuf == nil {
+		return errors.New("NotFound")
+	}
+
+	result := &FirebaseServiceAccountImpl{
+
+	}
+
+	if json.Unmarshal(jsonBuf, &result.rawServiceAccount) != nil {
+		return errors.New("Json parse failed")
+	}
+
+	if privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(result.rawServiceAccount.PrivateKey)); err == nil {
+		result.privateKey = privateKey
+	} else {
+		return nil
+	}
+
+	if keystore := NewPublicKeystore(GooglePublicKeystoreAccount); keystore != nil {
+		result.googlePublicKeys = keystore
+	} else {
+		return nil
+	}
+	if keystore := NewPublicKeystore(result.rawServiceAccount.ClientEmail); keystore != nil {
+		result.firebasePublicKeys = keystore
+	} else {
+		return nil
+	}
 }
 
 /**
@@ -133,4 +172,39 @@ func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenVerifier(ctx context.Co
 		ctx:ctx,
 		token:jwt,
 	}
+}
+
+/**
+ * Json Web TokenのVerifyオブジェクトを生成する
+ * Google Play Service:Authによって認証されたトークンはGoogle経由でVerifyを行なうほうが効率的
+ */
+func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
+	client := urlfetch.Client(ctx)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
+	defer resp.Body.Close()
+
+	if err != nil {
+		panic(err)
+		return nil
+	}
+
+	buf, _ := ioutil.ReadAll(resp.Body)
+
+	return &JsonWebTokenVerifierImpl{
+		service:it,
+		ctx:ctx,
+		token:string(buf),
+	}
+}
+
+/**
+ * Service Accountとして認証するためのOAuth2トークンを取得する
+ */
+func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
+	token := &OAuth2RefreshRequest{ctx:ctx}
+	token.AddScope(scope)
+	for _, value := range addScopes {
+		token.AddScope(value)
+	}
+	return token.GetToken()
 }

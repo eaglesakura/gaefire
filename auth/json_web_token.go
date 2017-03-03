@@ -37,6 +37,12 @@ type JsonWebTokenVerifier interface {
 	SkipExpireTime() JsonWebTokenVerifier
 
 	/**
+	 * 許可対象のAudienceを追加する
+	 * デフォルトではFirebase Service AccountのIDが登録される。
+	 */
+	AddTrustedAudience(aud string) JsonWebTokenVerifier
+
+	/**
 	 * "aud"チェックをスキップする
 	 *
 	 * 他のプロジェクトに対して発行されたJWTを許可してしまうので、これを使用する場合は十分にセキュリティに注意を払う

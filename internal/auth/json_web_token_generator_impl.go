@@ -3,7 +3,6 @@ package internal
 import (
 	"github.com/eaglesakura/gaefire/auth"
 	"github.com/dgrijalva/jwt-go"
-	"time"
 	"fmt"
 )
 
@@ -21,7 +20,7 @@ type TokenSourceModel struct {
  * Json Web Tokenを生成するGenerator
  */
 type JsonWebTokenGeneratorImpl struct {
-	service   *gaefire.FirebaseServiceAccount
+	service   gaefire.FirebaseServiceAccount
 	source    TokenSourceModel
 	headers   map[string]string
 	lastError error;
@@ -77,7 +76,4 @@ func (it *JsonWebTokenGeneratorImpl)Generate() (string, error) {
 
 	return signed, nil
 
-}
-
-func NewJsonWebTokenGenerator(service gaefire.FirebaseServiceAccount, userUniqueId string) gaefire.JsonWebTokenGenerator {
 }

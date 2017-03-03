@@ -13,6 +13,7 @@ type JsonWebTokenVerifierImpl struct {
 	service            gaefire.FirebaseServiceAccount
 	ctx                context.Context
 	token              string
+	trustedAud         []string
 	skipExpireCheck    bool
 	skipProjectIdCheck bool
 }
@@ -39,12 +40,40 @@ func (it *VerifyError)Error() string {
 	}
 }
 
+/**
+ * "有効期限をチェックしない
+ */
+func (it *JsonWebTokenVerifierImpl)SkipExpireTime() gaefire.JsonWebTokenVerifier {
+	it.skipExpireCheck = true
+	return it
+}
 
-//
-// Verify user JWT
-// check public key, by Header["kid"]. firebase default CustomToken
-// ex. Android => user.getToken(true)
-//
+/**
+ * 許可対象のAudienceを追加する
+ * デフォルトではFirebase Service AccountのIDが登録される。
+ */
+func (it *JsonWebTokenVerifierImpl)AddTrustedAudience(aud string) gaefire.JsonWebTokenVerifier {
+	if it.trustedAud == nil {
+		it.trustedAud = []string{aud}
+	} else {
+		it.trustedAud = append(it.trustedAud, aud)
+	}
+	return it
+}
+
+/**
+ * "aud"チェックをスキップする
+ *
+ * 他のプロジェクトに対して発行されたJWTを許可してしまうので、これを使用する場合は十分にセキュリティに注意を払う
+ */
+func (it *JsonWebTokenVerifierImpl)SkipProjectId() gaefire.JsonWebTokenVerifier {
+	it.skipProjectIdCheck = true
+	return it
+}
+
+/**
+ * 全てのオプションに対し、有効であることが確認できればtrue
+ */
 func (it *JsonWebTokenVerifierImpl)Verify(jwtToken string) (gaefire.VerifiedJsonWebToken, error) {
 	// parse & verify
 	rawToken, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {
@@ -101,10 +130,25 @@ func (it *JsonWebTokenVerifierImpl)Verify(jwtToken string) (gaefire.VerifiedJson
 	}
 
 	// Token check
-	projectId, err := result.GetProjectId()
-	if !it.skipProjectIdCheck && projectId != it.service.GetProjectId() {
-		log.Errorf(it.ctx, "Token replace attack? token[%v] require[%v] ", projectId, it.service.GetProjectId())
-		return nil, newTokenError(errors.New("Token project id error."))
+	if !it.skipProjectIdCheck {
+		trusted := false
+		projectId, _ := result.GetProjectId()
+		if projectId == it.service.GetProjectId() {
+			trusted = true
+		} else if it.trustedAud != nil {
+			for _, value := range it.trustedAud {
+				if value == projectId {
+					trusted = true
+				}
+			}
+		}
+
+
+		// 信頼できるIDが登録されていなかった
+		if !trusted {
+			log.Errorf(it.ctx, "Token replace attack? token[%v] service[%v] ", projectId, it.service.GetProjectId())
+			return nil, newTokenError(errors.New("Token project id error."))
+		}
 	}
 
 	return result, nil
