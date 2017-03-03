@@ -106,6 +106,14 @@ func (it *FirebaseServiceAccountImpl)GetPrivateKey() *rsa.PrivateKey {
 }
 
 /**
+ * 署名用のKeyIDを取得する
+ * これは公開鍵チェックの際 "kid"として利用できる
+ */
+func (it *FirebaseServiceAccountImpl)GetPrivateKeyId() string {
+	return it.rawServiceAccount.PrivateKeyId
+}
+
+/**
  * JWT署名検証のために公開鍵を検索する。
  *
  * デフォルトではServiceAccountsの公開鍵、もしくはGoogleの公開鍵を検索する

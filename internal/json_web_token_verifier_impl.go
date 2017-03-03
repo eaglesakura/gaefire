@@ -90,13 +90,20 @@ func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error)
 		}
 	})
 
-	if strings.Contains(err.Error(), "crypto/rsa") {
+	if err != nil && strings.Contains(err.Error(), "crypto/rsa") {
 		// Verify error
+		log.Errorf(it.ctx, "crypt/rsa error")
 		return nil, newTokenError(err)
+	} else if rawToken == nil {
+		// Verify error
+		log.Errorf(it.ctx, "Token format error")
+		return nil, newTokenError(errors.New("Token format error."))
 	}
 
 	if rawToken != nil && rawToken.Claims != nil {
-		log.Errorf(it.ctx, "Refresh Validate old[%v]", err.Error())
+		if err != nil {
+			log.Debugf(it.ctx, "Refresh Validate old[%v]", err.Error())
+		}
 		err = rawToken.Claims.Valid()
 	}
 
@@ -122,6 +129,7 @@ func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error)
 
 	// check error
 	if err != nil {
+		log.Errorf(it.ctx, "Validate error")
 		return nil, newTokenError(err)
 	}
 

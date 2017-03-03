@@ -24,32 +24,6 @@ package gaefire
 //	_TEST_MOBILE_REFRESH_TOKEN = ""	// replace refresh token
 //)
 //
-//func TestWebApplicationFromJson(t *testing.T) {
-//	JSON := _TEST_TOKEN_JSON
-//	web, err := NewWebApplicationFromJson([]byte(JSON))
-//	assert.Nil(t, err)
-//	assert.NotEqual(t, web.ClientId, "")
-//	assert.NotEqual(t, web.ClientSecret, "")
-//}
-//
-//func TestFirebaseAuthorizeService_NewService(t *testing.T) {
-//	serviceAccount := ServiceAccountJson{}
-//	if !assert.Nil(t, json.Unmarshal([]byte(_TEST_TOKEN_JSON), &serviceAccount)) {
-//		return;
-//	}
-//
-//	service, err := NewServiceAccount(&serviceAccount)
-//	if !assert.NotNil(t, service) {
-//		fmt.Errorf("Service create failed %v\n", err.Error())
-//		return;
-//	}
-//
-//	if !assert.NotNil(t, service.GetPrivateKey()) {
-//		fmt.Errorf("Private key generate failed\n")
-//		return;
-//	}
-//}
-//
 //func TestFirebaseAuthorizeService_NewToken(t *testing.T) {
 //	serviceAccount := ServiceAccountJson{}
 //
