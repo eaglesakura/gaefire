@@ -91,7 +91,7 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, er
 	}
 
 	if !token.Valid(it.ctx) {
-		errors.New("OAuth2 token validate error")
+		return gaefire.OAuth2Token{}, errors.New("OAuth2 token validate error")
 	}
 	//token.UserId = it.serviceAccount.GetAccountEmail()
 	//token.Scopes = it.scope
@@ -161,12 +161,14 @@ func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
 	token := gaefire.OAuth2Token{}
 
 	// Memcacheを優先ロードし、データが見つからなければ新規に取得する
-	err := req.Load(&token, func(ref interface{}) error {
+	if err := req.Load(&token, func(ref interface{}) error {
 		tokenRef, _ := ref.(*gaefire.OAuth2Token)
 		var err error
 		*tokenRef, err = it._newServiceOauth2Token()
 		return err
-	})
+	}); err != nil {
+		return gaefire.OAuth2Token{}, err
+	}
 
 	if it.webApplication != nil {
 		// ユーザー権限の場合、検証を行なう
@@ -180,5 +182,5 @@ func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
 		}
 	}
 
-	return token, err
+	return token, nil
 }

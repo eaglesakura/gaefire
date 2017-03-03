@@ -204,7 +204,7 @@ func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Cont
  * Service Accountとして認証するためのOAuth2トークンを取得する
  */
 func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
-	token := &OAuth2RefreshRequest{ctx:ctx}
+	token := &OAuth2RefreshRequest{ctx:ctx, serviceAccount:it }
 	token.AddScope(scope)
 	for _, value := range addScopes {
 		token.AddScope(value)

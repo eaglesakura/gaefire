@@ -32,53 +32,6 @@ package gaefire
 //	assert.NotEqual(t, web.ClientSecret, "")
 //}
 //
-//func TestServiceAccountAuth(t *testing.T) {
-//	testContext, delFunc, _ := aetest.NewContext()
-//	defer delFunc()
-//
-//	serviceAccount := ServiceAccountJson{}
-//	JSON := _TEST_TOKEN_JSON
-//
-//	if !assert.Nil(t, json.Unmarshal([]byte(JSON), &serviceAccount)) {
-//		assert.Fail(t, "JsonError")
-//		return;
-//	}
-//
-//	service, _ := NewServiceAccount(&serviceAccount)
-//
-//	token1st, err := service.NewServiceAccountAuthRequest(testContext).
-//		AddScope("https://www.googleapis.com/auth/firebase").
-//		AddScope("https://www.googleapis.com/auth/userinfo.email").
-//		AddScope("https://www.googleapis.com/auth/cloud-platform").
-//		GetToken()
-//	{
-//		if !assert.Nil(t, err) {
-//			log.Errorf(testContext, "OAuth error[%v]", err.Error())
-//			return
-//		}
-//
-//		assert.False(t, token1st.byCache)
-//		assert.NotEqual(t, token1st.GetToken(), "")
-//		ioutil.WriteFile("token_1.txt", []byte(token1st.GetToken()), os.ModePerm)
-//	}
-//
-//	token2nd, err := service.NewServiceAccountAuthRequest(testContext).
-//		AddScope("https://www.googleapis.com/auth/firebase").
-//		AddScope("https://www.googleapis.com/auth/userinfo.email").
-//		AddScope("https://www.googleapis.com/auth/cloud-platform").
-//		GetToken()
-//	{
-//		if !assert.Nil(t, err) {
-//			log.Errorf(testContext, "OAuth error[%v]", err.Error())
-//			return
-//		}
-//
-//		assert.True(t, token2nd.ByCache())
-//		assert.Equal(t, token2nd.GetToken(), token1st.GetToken())
-//		ioutil.WriteFile("token_2.txt", []byte(token2nd.GetToken()), os.ModePerm)
-//	}
-//}
-//
 //func TestFirebaseAuthorizeService_NewService(t *testing.T) {
 //	serviceAccount := ServiceAccountJson{}
 //	if !assert.Nil(t, json.Unmarshal([]byte(_TEST_TOKEN_JSON), &serviceAccount)) {

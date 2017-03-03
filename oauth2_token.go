@@ -15,7 +15,7 @@ type OAuth2Token struct {
 	/**
 	 * UserID
 	 */
-	UserId       string `json:"user_id,omitempty"`
+	Email        string `json:"email,omitempty"`
 
 	/**
 	 * Access scopes
@@ -50,7 +50,7 @@ func (it *OAuth2Token)Authorize(req *http.Request) {
  * ただし、有効期限のチェックを行わない。
  */
 func (it *OAuth2Token)Valid(ctx context.Context) bool {
-	if len(it.AccessToken) > 0 && len(it.TokenType) > 0 {
+	if len(it.AccessToken) == 0 || len(it.TokenType) == 0 {
 		return false
 	}
 
@@ -70,7 +70,7 @@ func (it *OAuth2Token)Valid(ctx context.Context) bool {
 	}
 
 	it.Scopes = tempToken.Scopes
-	it.UserId = tempToken.UserId
+	it.Email = tempToken.Email
 
 	return true
 }

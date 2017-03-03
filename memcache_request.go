@@ -90,6 +90,9 @@ func (it *MemcacheLoadRequest)Load(result interface{}, createFunc func(result in
 		createErr := createFunc(result)
 		if createErr == nil {
 			it.Save(result)
+			return nil
+		} else {
+			return createErr
 		}
 	}
 

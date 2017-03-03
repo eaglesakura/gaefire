@@ -1,0 +1,34 @@
+# システムディレクトリ, システムファイル
+.gradle/
+/.gopath
+build/
+.idea/
+.DS_Store
+.vscode/
+Thumbs.db
+*.iml
+
+# 成果物ディレクトリ
+ci-release/
+
+# 中間ファイル
+bin
+local.properties
+*.o
+*.o.d
+*.so
+gdb.setup
+gdbserver
+obj/
+latex/
+dependencies.txt
+
+# 外部ライブラリ
+# 必要に応じてsyncする
+private/
+out/
+*.exe
+*.db
+/pkg
+/bin
+*.txt
