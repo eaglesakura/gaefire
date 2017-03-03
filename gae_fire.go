@@ -1,24 +1,19 @@
 package gaefire
 
-import (
-	fire_assets "github.com/eaglesakura/gaefire/assets"
-	fire_auth"github.com/eaglesakura/gaefire/auth"
-)
-
 type GaeFire interface {
 	/**
 	 * AssetManagerを生成する
 	 */
-	NewAssetManager() fire_assets.AssetManager
+	NewAssetManager() AssetManager
 
 	/**
 	 * サービスアカウントを生成する
 	 */
-	NewServiceAccount(jsonBuf []byte) fire_auth.FirebaseServiceAccount
+	NewServiceAccount(jsonBuf []byte) FirebaseServiceAccount
 
 	/**
 	 * ユーザーOAuth2認証に利用するWebアプリケーションを生成する
 	 */
-	NewWebApplication(jsonBuf []byte) fire_auth.FirebaseWebApplication
+	NewWebApplication(jsonBuf []byte) FirebaseWebApplication
 }
 

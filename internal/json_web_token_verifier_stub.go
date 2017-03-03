@@ -1,8 +1,8 @@
-package internal
+package gaefire
 
 import (
-	"github.com/eaglesakura/gaefire/auth"
 	"errors"
+	"github.com/eaglesakura/gaefire"
 )
 
 type JsonWebTokenVerifierStubImpl struct {

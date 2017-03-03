@@ -1,17 +1,17 @@
-package internal
+package gaefire
 
 import (
 	"crypto/rsa"
-	"golang.org/x/net/context"
-	"github.com/eaglesakura/gaefire/auth"
-	"github.com/dgrijalva/jwt-go"
 	"time"
 	"fmt"
 	"errors"
 	"encoding/json"
-	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
+	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/log"
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/net/context"
+	"github.com/eaglesakura/gaefire"
 )
 
 const (

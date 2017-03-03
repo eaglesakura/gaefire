@@ -2,7 +2,6 @@ package gaefire
 
 import (
 	"os"
-	"github.com/eaglesakura/gaefire/assets"
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
@@ -40,9 +39,4 @@ func GenMD5(text string) string {
 	hash := md5.New()
 	hash.Write([]byte(text))
 	return hex.EncodeToString(hash.Sum(nil))
-}
-
-func LoadFileOrNil(assets gaefire.AssetManager, path string) []byte {
-	buf, _ := assets.LoadFile(path)
-	return buf
 }

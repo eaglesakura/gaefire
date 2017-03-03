@@ -1,4 +1,4 @@
-package internal
+package gaefire
 
 type WebApplicationInfoModel struct {
 	ProjectId    string        `json:"project_id"`

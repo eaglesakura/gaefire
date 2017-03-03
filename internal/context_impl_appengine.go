@@ -1,17 +1,17 @@
 // +build !gaetest
 
-package internal
+package gaefire
 
 import (
 	"net/http"
 	"google.golang.org/appengine"
-	"github.com/eaglesakura/gaefire/context"
+	"github.com/eaglesakura/gaefire"
 )
 
 /**
  * 通常のRequest用のContextを生成する
  */
-func NewContext(request *http.Request) gaefire.Context {
+func NewContextImpl(request *http.Request) gaefire.Context {
 	result := &ContextImpl{
 		ctx:appengine.NewContext(request),
 	};

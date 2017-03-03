@@ -1,9 +1,9 @@
-package internal
+package gaefire
 
 import (
-	"github.com/eaglesakura/gaefire/auth"
 	"github.com/dgrijalva/jwt-go"
 	"fmt"
+	"github.com/eaglesakura/gaefire"
 )
 
 /**

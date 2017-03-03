@@ -1,4 +1,4 @@
-package internal
+package gaefire
 
 import (
 	"golang.org/x/net/context"

@@ -1,12 +1,12 @@
-package internal
+package gaefire
 
 import (
-	"github.com/eaglesakura/gaefire/auth"
 	"golang.org/x/net/context"
 	"strings"
 	"github.com/dgrijalva/jwt-go"
 	"errors"
 	"google.golang.org/appengine/log"
+	"github.com/eaglesakura/gaefire"
 )
 
 type JsonWebTokenVerifierImpl struct {

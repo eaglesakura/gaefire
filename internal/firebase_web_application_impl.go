@@ -1,10 +1,10 @@
-package internal
+package gaefire
 
 import (
 	"golang.org/x/net/context"
-	"github.com/eaglesakura/gaefire/auth"
 	"encoding/json"
 	"errors"
+	"github.com/eaglesakura/gaefire"
 )
 
 type FirebaseWebApplicationImpl struct {

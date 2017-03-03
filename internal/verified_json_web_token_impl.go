@@ -1,4 +1,4 @@
-package internal
+package gaefire
 
 import (
 	"github.com/dgrijalva/jwt-go"
