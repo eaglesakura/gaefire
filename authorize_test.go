@@ -1,15 +1,5 @@
 package gaefire
 
-import (
-	"testing"
-	"github.com/stretchr/testify/assert"
-	"fmt"
-	"encoding/json"
-	"google.golang.org/appengine/aetest"
-	"google.golang.org/appengine/log"
-	"io/ioutil"
-	"os"
-)
 
 //// Firebase Storage link :: https://www.googleapis.com/storage/v1/b/${firebase-project}.appspot.com/o
 //

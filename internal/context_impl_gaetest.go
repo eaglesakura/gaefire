@@ -2,8 +2,11 @@
 
 package gaefire
 
-import "github.com/eaglesakura/gaefire/context"
-
+import (
+	"net/http"
+	"github.com/eaglesakura/gaefire"
+	"google.golang.org/appengine/aetest"
+)
 
 /**
  * UnitTest用のContextを生成する
@@ -16,7 +19,7 @@ func NewContextImpl(request *http.Request) gaefire.Context {
 
 	result := &ContextImpl{
 		ctx:ctx,
-		deleteFunc:delFunc,
+		closeFunc:delFunc,
 	};
 
 	return result;
