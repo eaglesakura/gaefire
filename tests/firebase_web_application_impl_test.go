@@ -39,7 +39,8 @@ func TestNewFirebaseWebApp(t *testing.T) {
 }
 
 type UserOAuthTestData struct {
-	AccessCode string `json:"accessCode"`
+	AccessCode   string `json:"accessCode"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 /**
@@ -75,4 +76,34 @@ func TestOAuth2TokenNew(t *testing.T) {
 	assert.Equal(t, token0.AccessToken, token1.AccessToken)
 	ioutil.WriteFile("private/user-token1.txt", []byte(token1.AccessToken), os.ModePerm)
 	ioutil.WriteFile("private/user-token1-refresh.txt", []byte(token1.RefreshToken), os.ModePerm)
+}
+
+/**
+ * リフレッシュトークンからOAuthTokenを再取得する
+ */
+func TestOAuth2TokenRefresh(t *testing.T) {
+	ctx := fire_utils.NewContext(nil)
+	defer ctx.Close()
+
+	webApp := newTestWebApp()
+	testData := newOAuthTestData()
+	if len(testData.RefreshToken) == 0 {
+		// skip testing
+		return
+	}
+
+	token2, err := webApp.GetUserAccountToken(ctx.GetAppengineContext(), testData.RefreshToken)
+	assert.Nil(t, err)
+	assert.NotEqual(t, token2.Email, "")
+	assert.NotEqual(t, token2.Scopes, "")
+	assert.Equal(t, token2.TokenType, "Bearer")
+	assert.NotEqual(t, token2.AccessToken, "")
+	assert.NotEqual(t, token2.RefreshToken, "")
+	ioutil.WriteFile("private/user-token2.txt", []byte(token2.AccessToken), os.ModePerm)
+
+	token3, err := webApp.GetUserAccountToken(ctx.GetAppengineContext(), testData.RefreshToken)
+	assert.Nil(t, err)
+	assert.Equal(t, token2.AccessToken, token3.AccessToken)
+	assert.Equal(t, token2.RefreshToken, token3.RefreshToken)
+	ioutil.WriteFile("private/user-token3.txt", []byte(token3.AccessToken), os.ModePerm)
 }

@@ -181,8 +181,13 @@ func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
 	if err := req.Load(&token, func(ref interface{}) error {
 		tokenRef, _ := ref.(*gaefire.OAuth2Token)
 		var err error
-		*tokenRef, err = it._newServiceOauth2Token()
-		return err
+		if it.serviceAccount != nil {
+			*tokenRef, err = it._newServiceOauth2Token()
+			return err
+		} else {
+			*tokenRef, err = it._newUserOauth2Token()
+			return err
+		}
 	}); err != nil {
 		return gaefire.OAuth2Token{}, err
 	}
