@@ -57,6 +57,7 @@ func (it *FirebaseWebApplicationImpl)GetClientSecret() string {
  */
 func (it *FirebaseWebApplicationImpl)NewUserAccountToken(ctx context.Context, accessCode string) (gaefire.OAuth2Token, error) {
 	tokenGen := &OAuth2RefreshRequest{
+		ctx:ctx,
 		webApplication:it,
 		accessCode:accessCode,
 	}
@@ -73,6 +74,7 @@ func (it *FirebaseWebApplicationImpl)NewUserAccountToken(ctx context.Context, ac
  */
 func (it *FirebaseWebApplicationImpl)GetUserAccountToken(ctx context.Context, refreshToken string) (gaefire.OAuth2Token, error) {
 	tokenGen := &OAuth2RefreshRequest{
+		ctx:ctx,
 		webApplication:it,
 		refreshToken:refreshToken,
 	}

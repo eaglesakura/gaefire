@@ -146,6 +146,23 @@ func (it *OAuth2RefreshRequest)_newUserOauth2Token() (gaefire.OAuth2Token, error
  */
 func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
 
+	if len(it.accessCode) > 0 {
+		// 初回取得の場合はキャッシュは絶対に存在しない
+		token, err := it._newUserOauth2Token()
+		if err != nil {
+			return gaefire.OAuth2Token{}, err
+		}
+
+		// キャッシュに突っ込む
+		gaefire.NewMemcacheRequest(it.ctx).
+			SetKindInfo(_OAUTH2_KIND_INFO).
+			SetExpireDate(time.Now().
+			Add(_OAUTH2_CACHE_DURATION)).
+			SetId("user-" + GenMD5(it.refreshToken)).
+			Save(&token)
+		return token, nil
+	}
+
 	var keyId string
 	if it.serviceAccount != nil {
 		keyId = it.serviceAccount.GetAccountEmail() + "-" + GenMD5(it.scope)
