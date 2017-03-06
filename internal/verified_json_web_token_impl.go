@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"fmt"
 	"errors"
+	"github.com/eaglesakura/gaefire"
 )
 
 type VerifiedJsonWebTokenImpl struct {
@@ -17,6 +18,18 @@ func (it *VerifiedJsonWebTokenImpl)GetUserId() (string, error) {
 	} else {
 		return fmt.Sprintf("%v", result), nil
 	}
+}
+/**
+ * Firebaseユーザーを取得する
+ */
+func (it *VerifiedJsonWebTokenImpl) GetUser(result *gaefire.FirebaseUser) error {
+	uid, err := it.GetUserId()
+	if err != nil {
+		return err
+	}
+
+	result.UniqueId = uid
+	return nil
 }
 
 func (it *VerifiedJsonWebTokenImpl)GetProjectId() (string, error) {

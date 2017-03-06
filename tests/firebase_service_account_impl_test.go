@@ -109,11 +109,14 @@ func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
 	token, err := service.NewGoogleAuthTokenVerifier(ctx.GetAppengineContext(), testData.GoogleIdToken).SkipProjectId().Valid()
 	assert.Nil(t, err)
 	assert.NotNil(t, token)
-	if value, err := token.GetUserId(); err != nil {
+
+	user := gaefire.FirebaseUser{}
+
+	if err := token.GetUser(&user); err != nil {
 		assert.Fail(t, err.Error())
 	} else {
-		assert.NotEqual(t, value, "")
-		ioutil.WriteFile("private/google-idtoken-uid.txt", []byte(value), os.ModePerm)
+		assert.NotEqual(t, user.UniqueId, "")
+		ioutil.WriteFile("private/google-idtoken-uid.txt", []byte(user.UniqueId), os.ModePerm)
 	}
 
 	if value, err := token.GetProjectId(); err != nil {

@@ -55,14 +55,19 @@ type JsonWebTokenVerifier interface {
 	Valid() (VerifiedJsonWebToken, error)
 }
 
+/**
+ * Verifyに合格したJson Web Token情報
+ */
 type VerifiedJsonWebToken interface {
+
 	/**
 	 * ユーザーID(uid)を取得する
 	 * 取得できない場合、errorを返却する
 	 *
 	 * Firebaseの場合、1-36文字の英数である。
+	 * ユーザー情報がtokenから見つからない場合、このメソッドはerrorを返却する
 	 */
-	GetUserId() (string, error)
+	GetUser(result *FirebaseUser) error
 
 	/**
 	 * プロジェクトID(aud)を取得する
