@@ -89,3 +89,37 @@ func TestServiceAccountJwtGen(t *testing.T) {
 
 	ioutil.WriteFile("private/firebase-auth-token.txt", []byte(jwt), os.ModePerm)
 }
+
+/**
+ * GoogleIdTokenのValidateを行なう
+ */
+func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
+
+	ctx := fire_utils.NewContext(nil)
+	defer ctx.Close()
+
+	service := newTestServiceAccount()
+	testData := newOAuthTestData()
+
+	if len(testData.GoogleIdToken) == 0 {
+		// skip test
+		return
+	}
+
+	token, err := service.NewGoogleAuthTokenVerifier(ctx.GetAppengineContext(), testData.GoogleIdToken).SkipProjectId().Valid()
+	assert.Nil(t, err)
+	assert.NotNil(t, token)
+	if value, err := token.GetUserId(); err != nil {
+		assert.Fail(t, err.Error())
+	} else {
+		assert.NotEqual(t, value, "")
+		ioutil.WriteFile("private/google-idtoken-uid.txt", []byte(value), os.ModePerm)
+	}
+
+	if value, err := token.GetProjectId(); err != nil {
+		assert.Fail(t, err.Error())
+	} else {
+		assert.NotEqual(t, value, "")
+		ioutil.WriteFile("private/google-idtoken-aud.txt", []byte(value), os.ModePerm)
+	}
+}
