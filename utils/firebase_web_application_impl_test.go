@@ -1,17 +1,16 @@
 package gaefire
 
 import (
-	"github.com/eaglesakura/gaefire"
-	fire_utils "github.com/eaglesakura/gaefire/utils"
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"github.com/eaglesakura/gaefire"
 )
 
 func newTestWebApp() gaefire.FirebaseWebApplication {
-	fire := fire_utils.NewGaeFire()
+	fire := NewGaeFire()
 	if json, err := fire.NewAssetManager().LoadFile("assets/firebase-web.json"); err != nil {
 		panic(err)
 	} else {
@@ -21,7 +20,7 @@ func newTestWebApp() gaefire.FirebaseWebApplication {
 
 func newOAuthTestData() UserOAuthTestData {
 	result := UserOAuthTestData{}
-	fire := fire_utils.NewGaeFire()
+	fire := NewGaeFire()
 	if jsonBuf, err := fire.NewAssetManager().LoadFile("private/oauth-test-token.json"); err != nil {
 		panic(err)
 	} else {
@@ -48,7 +47,7 @@ type UserOAuthTestData struct {
  * アクセスコードからOAuth2トークンを生成する
  */
 func TestOAuth2TokenNew(t *testing.T) {
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	webApp := newTestWebApp()
@@ -83,7 +82,7 @@ func TestOAuth2TokenNew(t *testing.T) {
  * リフレッシュトークンからOAuthTokenを再取得する
  */
 func TestOAuth2TokenRefresh(t *testing.T) {
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	webApp := newTestWebApp()

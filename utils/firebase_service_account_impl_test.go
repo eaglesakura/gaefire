@@ -2,7 +2,6 @@ package gaefire
 
 import (
 	"github.com/eaglesakura/gaefire"
-	fire_utils "github.com/eaglesakura/gaefire/utils"
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -10,7 +9,7 @@ import (
 )
 
 func newTestServiceAccount() gaefire.FirebaseServiceAccount {
-	fire := fire_utils.NewGaeFire()
+	fire := NewGaeFire()
 	if json, err := fire.NewAssetManager().LoadFile("assets/firebase-admin.json"); err != nil {
 		panic(err)
 	} else {
@@ -30,7 +29,7 @@ func TestNewFirebaseServiceAccount(t *testing.T) {
  * OAuth2トークンが生成される
  */
 func TestServiceAccountAuthGen(t *testing.T) {
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	service := newTestServiceAccount()
@@ -50,7 +49,7 @@ func TestServiceAccountAuthGen(t *testing.T) {
  * OAuth2トークンがキャッシュされる
  */
 func TestServiceAccountAuthCache(t *testing.T) {
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	service := newTestServiceAccount()
@@ -73,7 +72,7 @@ func TestServiceAccountAuthCache(t *testing.T) {
  * 認証用JWTが生成できる
  */
 func TestServiceAccountJwtGen(t *testing.T) {
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	service := newTestServiceAccount()
@@ -95,7 +94,7 @@ func TestServiceAccountJwtGen(t *testing.T) {
  */
 func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
 
-	ctx := fire_utils.NewContext(nil)
+	ctx := NewContext(nil)
 	defer ctx.Close()
 
 	service := newTestServiceAccount()
