@@ -13,10 +13,10 @@ import (
 	"io/ioutil"
 	"strings"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/eaglesakura/swagger-go-core/swag-port"
 	"google.golang.org/appengine"
 	"encoding/base64"
 	"google.golang.org/appengine/log"
+	"github.com/eaglesakura/swagger-go-core/swag-port"
 )
 
 var (
@@ -142,6 +142,7 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 	// OAuth2 Tokenである
 	token := gaefire.OAuth2Token{TokenType:"Bearer", AccessToken:authorization}
 	if !token.Valid(ctx) {
+		log.Errorf(ctx, "Invalid OAuth2 token[%v]", authorization)
 		return errors.New(http.StatusForbidden, "Invalid oauth2 token")
 	}
 
@@ -152,6 +153,11 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 		if len(aud) > 0 && aud == token.Audience {
 			validAudience = true
 		}
+	}
+
+	// サービスアカウントのOAuth2トークンも許可する
+	if !validAudience && (token.Audience == it.ServiceAccount.GetClientId()) {
+		validAudience = true
 	}
 
 	if !validAudience {
@@ -175,7 +181,7 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 
 func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtString string, result *gaefire.AuthenticationInfo) error {
 	token, _ := jwt.Parse(jwtString, nil)
-	if token == nil {
+	if token == nil || token.Claims == nil {
 		return errors.New(http.StatusForbidden, "Token not supported format")
 	}
 
@@ -187,6 +193,7 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 		var verifier gaefire.JsonWebTokenVerifier
 		var googleJwt *string
 		var firebaseJwt *string
+		var serviceJwt *string
 
 		if issuer == it.Swagger.SecurityDefinitions.GoogleIdToken.Issuer {
 			// Google IdTokenとして検証する
@@ -199,7 +206,12 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 			// Firebase Userとして扱う
 			verifier = it.ServiceAccount.NewFirebaseAuthTokenVerifier(ctx, jwtString)
 			firebaseJwt = &jwtString
-		}else {
+		} else if issuer == it.ServiceAccount.GetClientEmail() {
+			// 自身が発行したFirebase JsonWebTokenとして扱う
+			verifier = it.ServiceAccount.NewFirebaseAuthTokenVerifier(ctx, jwtString)
+			verifier.AddTrustedAudience("https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit")
+			serviceJwt = &jwtString
+		} else {
 			log.Errorf(ctx, "User JWT check error issuer[%v]", issuer)
 			return errors.New(http.StatusForbidden, "Issuer error")
 		}
@@ -210,13 +222,16 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 		} else {
 			result.FirebaseToken = firebaseJwt
 			result.GoogleIdToken = googleJwt
+			result.ServiceAccountToken = serviceJwt
 			result.User = &gaefire.UserInfo{}
-			if email, err := validToken.GetClaim("email"); err != nil {
+			if email, err := validToken.GetClaim("email"); err == nil {
 				result.User.Email = swag_port.String(fmt.Sprintf("%v", email))
 			}
 
-			if user_id, err := validToken.GetClaim("user_id"); err != nil {
+			if user_id, err := validToken.GetClaim("user_id"); err == nil {
 				result.User.Id = swag_port.String(fmt.Sprintf("%v", user_id))
+			} else if uid, err := validToken.GetClaim("uid"); err == nil {
+				result.User.Id = swag_port.String(fmt.Sprintf("%v", uid))
 			}
 		}
 	}

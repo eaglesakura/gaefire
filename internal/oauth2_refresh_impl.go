@@ -58,8 +58,8 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, er
 				ExpiresAt: time.Now().Unix() + 3600,
 				IssuedAt:time.Now().Unix(),
 				Audience:"https://www.googleapis.com/oauth2/v4/token",
-				Issuer:it.serviceAccount.GetAccountEmail(),
-				Subject:it.serviceAccount.GetAccountEmail(),
+				Issuer:it.serviceAccount.GetClientEmail(),
+				Subject:it.serviceAccount.GetClientEmail(),
 			},
 			Scope:it.scope,
 			Claims:map[string]string{},
@@ -165,7 +165,7 @@ func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
 
 	var keyId string
 	if it.serviceAccount != nil {
-		keyId = it.serviceAccount.GetAccountEmail() + "-" + GenMD5(it.scope)
+		keyId = it.serviceAccount.GetClientEmail() + "-" + GenMD5(it.scope)
 	} else {
 		keyId = "user-" + GenMD5(it.refreshToken)
 	}

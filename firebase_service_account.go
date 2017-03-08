@@ -22,7 +22,13 @@ type FirebaseServiceAccount interface {
 	/**
 	 * Service Accountのメールアドレスを取得する
 	 */
-	GetAccountEmail() string
+	GetClientEmail() string
+
+	/**
+	 * サービスアカウント識別IDを取得する
+	 * oauth2トークンを生成した場合、audに対応される
+	 */
+	GetClientId() string
 
 	/**
 	 * 署名のためのPrivate Keyを取得する

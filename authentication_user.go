@@ -17,26 +17,31 @@ type AuthenticationInfo struct {
 	 * 妥当なAPI Keyが使われた場合、!=nilとなる。
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	ApiKey        *string
+	ApiKey              *string
 
 	/**
-	 * Firebase Tokenが使用された場合にsetされる
+	 * Firebaseが署名したTokenが使用された場合にsetされる
 	 */
-	FirebaseToken *string
+	FirebaseToken       *string
+
+	/**
+	 * Firebase Service Accountが署名したTokenが使用された場合にsetされる
+	 */
+	ServiceAccountToken *string
 
 	/**
 	 * Google Tokenが使用された場合にsetされる
 	 */
-	GoogleIdToken *string
+	GoogleIdToken       *string
 
 	/**
 	 * OAuth2 Tokenが使用された場合にsetされる
 	 */
-	OAuth2Token   *string
+	OAuth2Token         *string
 
 	/**
 	 * 認証されたユーザー情報
 	 * 認証されなければとなる。
 	 */
-	User          *UserInfo
+	User                *UserInfo
 }

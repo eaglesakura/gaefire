@@ -94,8 +94,15 @@ func (it *FirebaseServiceAccountImpl)GetProjectId() string {
 /**
  * Service Accountのメールアドレスを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetAccountEmail() string {
+func (it *FirebaseServiceAccountImpl)GetClientEmail() string {
 	return it.rawServiceAccount.ClientEmail
+}
+
+/**
+ * クライアント識別IDを取得する
+ */
+func (it *FirebaseServiceAccountImpl)GetClientId() string {
+	return it.rawServiceAccount.ClientId
 }
 
 /**
@@ -164,8 +171,8 @@ func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenGenerator(userUniqueId 
 				ExpiresAt: time.Now().Unix() + 3600,
 				IssuedAt:time.Now().Unix(),
 				Audience:"https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
-				Issuer:it.GetAccountEmail(),
-				Subject:it.GetAccountEmail(),
+				Issuer:it.GetClientEmail(),
+				Subject:it.GetClientEmail(),
 			},
 			Uid:userUniqueId,
 			Claims:map[string]string{},

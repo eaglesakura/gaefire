@@ -40,7 +40,7 @@ type OAuth2Token struct {
 	/**
 	 * OAuth2 aud
 	 */
-	Audience     string `json:"aud"`
+	Audience     string `json:"aud,omitempty"`
 }
 
 /**
@@ -59,7 +59,7 @@ func (it *OAuth2Token)Valid(ctx context.Context) bool {
 		return false
 	}
 
-	resp, err := urlfetch.Client(ctx).Get("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + it.AccessToken)
+	resp, err := urlfetch.Client(ctx).Get("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + it.AccessToken)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	}
