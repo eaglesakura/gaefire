@@ -105,18 +105,36 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 	model.Operation.OperationId = appengine.RequestID(ctx)
 	model.Operation.OperationName = "check:" + model.Operation.OperationId
 	model.Operation.ConsumerId = "api_key:" + apiKey
-	model.Operation.StartTime = fmt.Sprintf("%v", time.Now())
+	model.Operation.StartTime = time.Now().Format(time.RFC3339Nano)
 
 	buf, _ := json.Marshal(model)
 
-	resp, err := urlfetch.Client(ctx).Post("https://servicecontrol.googleapis.com/v1/services/" + it.Swagger.Host + ":check", "application/json", bytes.NewReader(buf))
+	accessToken, err := it.ServiceAccount.GetServiceAccountToken(ctx,
+		"https://www.googleapis.com/auth/service.management",
+		"https://www.googleapis.com/auth/servicecontrol")
+	if err != nil {
+		log.Errorf(ctx, "ServiceAccount token failed")
+		return err
+	}
+
+	var request *http.Request
+	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/" + it.Swagger.Host + ":check", bytes.NewReader(buf)); err != nil {
+		return err
+	} else {
+		req.Header.Add("Content-Type", "application/json")
+		//req.Header.Add("Authorization", "Bearer " + accessToken.AccessToken)
+		accessToken.Authorize(req)
+		request = req
+	}
+	resp, err := urlfetch.Client(ctx).Do(request)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	}
 
 	if err != nil || resp.StatusCode != 200 {
-		log.Errorf(ctx, "User security service check error api_key[%v]", apiKey)
-		return errors.New(http.StatusBadRequest, "ApiKey check error")
+		log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
+		log.Errorf(ctx, "  - post body[%v]", string(buf))
+		return errors.New(http.StatusForbidden, "ApiKey check error")
 	}
 
 	// バッファを読み取る
@@ -124,13 +142,13 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 
 	validModel := ServiceCheckResultModel{}
 	if err := json.Unmarshal(buf, &validModel); err != nil {
-		return errors.New(http.StatusBadRequest, "ApiKey parse error")
+		return errors.New(http.StatusForbidden, "ApiKey parse error")
 	}
 
-	if len(*validModel.CheckErrors) > 0 {
+	if validModel.CheckErrors != nil && len(*validModel.CheckErrors) > 0 {
 		// エラーが発生している
 		log.Errorf(ctx, "User api_key check error error[%v]", (*validModel.CheckErrors)[0].Detail)
-		return errors.New(http.StatusBadRequest, (*validModel.CheckErrors)[0].Detail)
+		return errors.New(http.StatusForbidden, (*validModel.CheckErrors)[0].Detail)
 	}
 
 	// API Keyは問題ない
@@ -168,6 +186,7 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 	}
 
 	result.OAuth2Token = &authorization
+	result.Audience = &token.Audience
 	result.User = &gaefire.UserInfo{
 	}
 
@@ -220,12 +239,17 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 			log.Errorf(ctx, "User JWT check error err[%v]", err.Error())
 			return err
 		} else {
+			result.Issuer = &issuer
 			result.FirebaseToken = firebaseJwt
 			result.GoogleIdToken = googleJwt
 			result.ServiceAccountToken = serviceJwt
 			result.User = &gaefire.UserInfo{}
 			if email, err := validToken.GetClaim("email"); err == nil {
 				result.User.Email = swag_port.String(fmt.Sprintf("%v", email))
+			}
+
+			if aud, err := validToken.GetClaim("aud"); err == nil {
+				result.Audience = swag_port.String(fmt.Sprintf("%v", aud))
 			}
 
 			if user_id, err := validToken.GetClaim("user_id"); err == nil {

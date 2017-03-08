@@ -50,6 +50,7 @@ func (it *OAuth2Token)Authorize(req *http.Request) {
 	req.Header.Set("Authorization", it.TokenType + " " + it.AccessToken)
 }
 
+
 /**
  * トークンが有効であればtrue
  * ただし、有効期限のチェックを行わない。

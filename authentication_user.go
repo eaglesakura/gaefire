@@ -14,28 +14,44 @@ type UserInfo struct {
  */
 type AuthenticationInfo struct {
 	/**
-	 * 妥当なAPI Keyが使われた場合、!=nilとなる。
+	 * "iss"に相当する要素が含まれている場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
+	 */
+	Issuer              *string
+
+	/**
+	 * "aud","audience"に相当する要素が含まれている場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
+	 */
+	Audience            *string
+
+	/**
+	 * API Keyが使われた場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
 	ApiKey              *string
 
 	/**
 	 * Firebaseが署名したTokenが使用された場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
 	 */
 	FirebaseToken       *string
 
 	/**
 	 * Firebase Service Accountが署名したTokenが使用された場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
 	 */
 	ServiceAccountToken *string
 
 	/**
 	 * Google Tokenが使用された場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
 	 */
 	GoogleIdToken       *string
 
 	/**
 	 * OAuth2 Tokenが使用された場合にsetされる
+	 * nil以外の場合、len()は必ず1以上となる。
 	 */
 	OAuth2Token         *string
 

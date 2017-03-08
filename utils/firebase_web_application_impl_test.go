@@ -38,9 +38,9 @@ func TestNewFirebaseWebApp(t *testing.T) {
 }
 
 type UserOAuthTestData struct {
-	AccessCode    string `json:"accessCode"`
-	RefreshToken  string `json:"refreshToken"`
-	GoogleIdToken string `json:"googleIdToken"`
+	AccessCode    string `json:"accessCode,omitempty"`
+	RefreshToken  string `json:"refreshToken,omitempty"`
+	GoogleIdToken string `json:"googleIdToken,omitempty"`
 }
 
 /**
