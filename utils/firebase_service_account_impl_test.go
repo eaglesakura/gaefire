@@ -17,6 +17,15 @@ func newTestServiceAccount() gaefire.FirebaseServiceAccount {
 	}
 }
 
+func newTestSwaggerJson() []byte {
+	fire := NewGaeFire()
+	if buf, err := fire.NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
+		panic(err)
+	} else {
+		return buf
+	}
+}
+
 /**
  * サービスアカウントの生成が行える
  */
@@ -35,7 +44,12 @@ func TestServiceAccountAuthGen(t *testing.T) {
 	service := newTestServiceAccount()
 
 	// トークンを取得する
-	token1, err := service.GetServiceAccountToken(ctx.GetAppengineContext(), "https://www.googleapis.com/auth/firebase", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/cloud-platform")
+	token1, err := service.GetServiceAccountToken(ctx.GetAppengineContext(),
+		"https://www.googleapis.com/auth/firebase",
+		"https://www.googleapis.com/auth/userinfo.email",
+		"https://www.googleapis.com/auth/cloud-platform",
+		"https://www.googleapis.com/auth/service.management",
+		"https://www.googleapis.com/auth/servicecontrol")
 	assert.Nil(t, err)
 	assert.NotEqual(t, token1.AccessToken, "")
 	assert.NotEqual(t, token1.Scopes, "")
@@ -124,4 +138,17 @@ func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
 		assert.NotEqual(t, value, "")
 		ioutil.WriteFile("private/google-idtoken-aud.txt", []byte(value), os.ModePerm)
 	}
+}
+
+/**
+ * ProxyServiceを生成できる
+ */
+func TestAuthProxy_Create(t *testing.T) {
+	ctx := NewContext(nil)
+	defer ctx.Close()
+
+	service := newTestServiceAccount()
+
+	proxy := service.NewAuthenticationProxy(newTestSwaggerJson())
+	assert.NotNil(t, proxy)
 }

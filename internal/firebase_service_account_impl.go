@@ -219,3 +219,20 @@ func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context,
 	}
 	return token.GetToken()
 }
+
+/**
+ * 認証サポート用のProxyを生成する。
+ * 認証情報はswagger.jsonを元にパースされる。
+ * パースに失敗した場合はnilが返却される
+ */
+func (it *FirebaseServiceAccountImpl)NewAuthenticationProxy(swaggerJson []byte) gaefire.AuthenticationProxy {
+	result := &AuthenticationProxyImpl{
+		ServiceAccount:it,
+	}
+
+	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
+		return nil
+	}
+
+	return result
+}

@@ -13,7 +13,7 @@ import (
 
 type OAuth2Token struct {
 	/**
-	 * UserID
+	 * mail
 	 */
 	Email        string `json:"email,omitempty"`
 
@@ -36,6 +36,11 @@ type OAuth2Token struct {
 	 * OAuth2 Refresh token
 	 */
 	RefreshToken string `json:"refresh_token,omitempty"`
+
+	/**
+	 * OAuth2 aud
+	 */
+	Audience     string `json:"aud"`
 }
 
 /**
@@ -57,8 +62,15 @@ func (it *OAuth2Token)Valid(ctx context.Context) bool {
 	resp, err := urlfetch.Client(ctx).Get("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + it.AccessToken)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
-	} else if err != nil {
+	}
+
+	if err != nil {
 		log.Errorf(ctx, "OAuth2 validate error[%s]", err.Error())
+		return false
+	}
+
+	if resp.StatusCode != 200 {
+		log.Errorf(ctx, "OAuth2 invalid_token")
 		return false
 	}
 
@@ -69,8 +81,15 @@ func (it *OAuth2Token)Valid(ctx context.Context) bool {
 		return false
 	}
 
-	it.Scopes = tempToken.Scopes
-	it.Email = tempToken.Email
+	if len(tempToken.Scopes) > 0 {
+		it.Scopes = tempToken.Scopes
+	}
+	if len(tempToken.Email) > 0 {
+		it.Email = tempToken.Email
+	}
+	if len(tempToken.Audience) > 0 {
+		it.Audience = tempToken.Audience
+	}
 
 	return true
 }
