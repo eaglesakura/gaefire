@@ -8,18 +8,16 @@ import (
 	"os"
 )
 
-func newTestServiceAccount() gaefire.FirebaseServiceAccount {
-	fire := NewGaeFire()
-	if json, err := fire.NewAssetManager().LoadFile("assets/firebase-admin.json"); err != nil {
+func newTestServiceAccount() gaefire.ServiceAccount {
+	if json, err := NewAssetManager().LoadFile("assets/firebase-admin.json"); err != nil {
 		panic(err)
 	} else {
-		return fire.NewServiceAccount(json)
+		return NewServiceAccount(json)
 	}
 }
 
-func newTestSwaggerJson() []byte {
-	fire := NewGaeFire()
-	if buf, err := fire.NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
+func newTestSwaggerJsonBinary() []byte {
+	if buf, err := NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
 		panic(err)
 	} else {
 		return buf
@@ -132,7 +130,7 @@ func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
 		ioutil.WriteFile("private/google-idtoken-uid.txt", []byte(user.UniqueId), os.ModePerm)
 	}
 
-	if value, err := token.GetProjectId(); err != nil {
+	if value, err := token.GetAudience(); err != nil {
 		assert.Fail(t, err.Error())
 	} else {
 		assert.NotEqual(t, value, "")
@@ -149,6 +147,6 @@ func TestAuthProxy_Create(t *testing.T) {
 
 	service := newTestServiceAccount()
 
-	proxy := service.NewAuthenticationProxy(newTestSwaggerJson())
+	proxy := service.NewAuthenticationProxy(newTestSwaggerJsonBinary())
 	assert.NotNil(t, proxy)
 }

@@ -9,19 +9,17 @@ import (
 	"github.com/eaglesakura/gaefire"
 )
 
-func newTestWebApp() gaefire.FirebaseWebApplication {
-	fire := NewGaeFire()
-	if json, err := fire.NewAssetManager().LoadFile("assets/firebase-web.json"); err != nil {
+func newTestWebApp() gaefire.WebApplication {
+	if json, err := NewAssetManager().LoadFile("assets/firebase-web.json"); err != nil {
 		panic(err)
 	} else {
-		return fire.NewWebApplication(json)
+		return NewWebApplication(json)
 	}
 }
 
 func newOAuthTestData() UserOAuthTestData {
 	result := UserOAuthTestData{}
-	fire := NewGaeFire()
-	if jsonBuf, err := fire.NewAssetManager().LoadFile("private/oauth-test-token.json"); err != nil {
+	if jsonBuf, err := NewAssetManager().LoadFile("private/oauth-test-token.json"); err != nil {
 		panic(err)
 	} else {
 		json.Unmarshal(jsonBuf, &result)

@@ -20,7 +20,7 @@ type TokenSourceModel struct {
  * Json Web Tokenを生成するGenerator
  */
 type JsonWebTokenGeneratorImpl struct {
-	service   gaefire.FirebaseServiceAccount
+	service   gaefire.ServiceAccount
 	source    TokenSourceModel
 	headers   map[string]string
 	lastError error;

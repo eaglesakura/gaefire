@@ -11,7 +11,7 @@ type FirebaseWebApplicationImpl struct {
 	rawWebApp WebApplicationModel
 }
 
-func NewFirebaseWebApplication(jsonBuf []byte) gaefire.FirebaseWebApplication {
+func NewWebApplication(jsonBuf []byte) gaefire.WebApplication {
 
 	result := &FirebaseWebApplicationImpl{}
 

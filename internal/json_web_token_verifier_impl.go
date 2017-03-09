@@ -10,7 +10,7 @@ import (
 )
 
 type JsonWebTokenVerifierImpl struct {
-	service            gaefire.FirebaseServiceAccount
+	service            gaefire.ServiceAccount
 	ctx                context.Context
 	token              string
 	trustedAud         []string
@@ -143,7 +143,7 @@ func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error)
 	// Token check
 	if !it.skipProjectIdCheck {
 		trusted := false
-		projectId, _ := result.GetProjectId()
+		projectId, _ := result.GetAudience()
 		if projectId == it.service.GetProjectId() {
 			trusted = true
 		} else if it.trustedAud != nil {

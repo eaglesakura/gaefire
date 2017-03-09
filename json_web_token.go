@@ -59,7 +59,6 @@ type JsonWebTokenVerifier interface {
  * Verifyに合格したJson Web Token情報
  */
 type VerifiedJsonWebToken interface {
-
 	/**
 	 * ユーザーID(uid)を取得する
 	 * 取得できない場合、errorを返却する
@@ -73,16 +72,16 @@ type VerifiedJsonWebToken interface {
 	 * プロジェクトID(aud)を取得する
 	 * 取得できない場合、errorを返却する
 	 */
-	GetProjectId() (string, error)
+	GetAudience() (string, error)
 
 	/**
-	 * 指定したkeyに紐付いた値を取得する。
+	 * 指定したkeyに紐付いたクレーム値を取得する。
 	 * 取得できない場合、errorを返却する
 	 */
 	GetClaim(key string) (interface{}, error)
 
 	/**
-	 * 指定したkeyに紐付いた値をヘッダから取得する
+	 * 指定したkeyに紐付いたヘッダ値を取得する
 	 * 取得できない場合、errorを返却する
 	 */
 	GetHeader(key string) (interface{}, error)

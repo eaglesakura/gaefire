@@ -54,7 +54,7 @@ func (it *MemcacheLoadRequest)SetId(id string) *MemcacheLoadRequest {
 }
 
 func (it *MemcacheLoadRequest)getKey() string {
-	return fmt.Sprintf("internal.gaestore.%v:%v.%v", it.kind.Name, it.kind.Version, it.uniqueId)
+	return fmt.Sprintf("internal.gaefire.%v:%v.%v", it.kind.Name, it.kind.Version, it.uniqueId)
 }
 
 func (it *MemcacheLoadRequest)Save(value interface{}) error {

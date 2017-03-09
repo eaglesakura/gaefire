@@ -12,8 +12,9 @@ import (
  * * JWT生成
  * * JWT検証
  * * サービスアカウントのOAuthトークン生成・リフレッシュ
+ * * ユーザー認証(OAuth2, Firebase/JWT, ServiceAccount/JWT, GoogleIdToken/JWT)
  */
-type FirebaseServiceAccount interface {
+type ServiceAccount interface {
 	/**
 	 * GCP Project IDを取得する
 	 */

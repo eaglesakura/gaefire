@@ -11,7 +11,7 @@ import (
 /**
  * 通常のRequest用のContextを生成する
  */
-func NewContextImpl(request *http.Request) gaefire.Context {
+func NewContext(request *http.Request) gaefire.Context {
 	result := &ContextImpl{
 		ctx:appengine.NewContext(request),
 	};

@@ -52,7 +52,7 @@ type FirebaseServiceAccountImpl struct {
 	firebasePublicKeys *PublicKeystore
 }
 
-func NewFirebaseServiceAccount(jsonBuf []byte) gaefire.FirebaseServiceAccount {
+func NewServiceAccount(jsonBuf []byte) gaefire.ServiceAccount {
 	if jsonBuf == nil {
 		panic(errors.New("NotFound"))
 	}

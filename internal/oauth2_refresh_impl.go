@@ -20,12 +20,12 @@ var (
 type OAuth2RefreshRequest struct {
 	ctx            context.Context
 
-	serviceAccount gaefire.FirebaseServiceAccount // for Service Account
-	scope          string                         // for Service Account
+	serviceAccount gaefire.ServiceAccount // for Service Account
+	scope          string                 // for Service Account
 
-	webApplication gaefire.FirebaseWebApplication // for User Account
-	accessCode     string                         // for User Account
-	refreshToken   string                         // for User Account
+	webApplication gaefire.WebApplication // for User Account
+	accessCode     string                 // for User Account
+	refreshToken   string                 // for User Account
 }
 
 

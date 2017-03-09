@@ -7,9 +7,7 @@ import (
 )
 
 func newTestSwaggerJson() SwaggerJsonModel {
-	fire := GaeFireImpl{}
-	fire.Initialize()
-	if buf, err := fire.NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
+	if buf, err := NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
 		panic(err)
 	} else {
 		result := SwaggerJsonModel{}

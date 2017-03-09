@@ -8,7 +8,7 @@ import "golang.org/x/net/context"
  * 下記の機能を提供する:
  * * ユーザーOAuth2トークン管理
  */
-type FirebaseWebApplication interface {
+type WebApplication interface {
 	/**
 	 * GCP Project IDを取得する
 	 */

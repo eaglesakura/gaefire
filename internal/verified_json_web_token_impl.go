@@ -32,7 +32,7 @@ func (it *VerifiedJsonWebTokenImpl) GetUser(result *gaefire.FirebaseUser) error 
 	return nil
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetProjectId() (string, error) {
+func (it *VerifiedJsonWebTokenImpl)GetAudience() (string, error) {
 	result, err := it.GetClaim("aud")
 	if err != nil {
 		return "", err

@@ -70,7 +70,7 @@ type AuthenticationProxyImpl struct {
 	/**
 	 * 処理対象のサービスアカウント情報
 	 */
-	ServiceAccount gaefire.FirebaseServiceAccount
+	ServiceAccount gaefire.ServiceAccount
 
 	/**
 	 * セキュリティチェックソースとなるSwagger情報
