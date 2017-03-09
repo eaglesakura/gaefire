@@ -23,12 +23,15 @@ type AuthenticationProxy interface {
 	 * 認証サポート用のProxyを生成する。
 	 * Google Cloud Endpoints 2.0と同じくユーザーやAPI Keの検証を行うが、APIごとのチェック（認証が必要か、等）は自身で行う必要がある。
 	 * Google Cloud Endpoints仕様に従い、下記のAuthorizationヘッダをサポートする
-	 * Proxyを通過した時点で、X-Endpoints-UserInfoヘッダが必要に応じて付与される。
+	 * Proxyを通過した時点で、X-Endpoints-UserInfoヘッダが（匿名以外であれば）付与される。
 	 *
-	 * in:[query|header] api_key={your.gcp.api_key}
-	 * "Authorization: Bearer {your.oauth2.token}"
-	 * "Authorization: Bearer {google.json.web.token}"
-	 * "Authorization: Bearer {firebase.json.web.token}"
+	 * APIKeyの場合、query|headerからGet(${Key})するときのKeyにはswagger.jsonで指定されるapi_keyのnameが使用される。
+	 *
+	 * in:query key={your.gcp.api_key}
+	 * in:header "Authorization: key: {your.gcp.api_key}"
+	 * in:header "Authorization: Bearer {your.oauth2.token}"
+	 * in:header "Authorization: Bearer {google.json.web.token}"
+	 * in:header "Authorization: Bearer {firebase.json.web.token}"
 	 *
 	 * このAPIを使用するためには、事前にswagger.json(openapi.json)を `gcloud service-management deploy path/to/swagger.json` でデプロイしておく必要がある。
 	 */

@@ -2,6 +2,7 @@ package gaefire
 
 /**
  * X-Endpoint-API-UserInfoにbase64エンコードされて書き込まれる認証情報
+ * Google Cloud Endpoints 2.0互換のModelとなる。
  */
 type UserInfo struct {
 	Issuer *string        `json:"issuer"`
@@ -57,7 +58,7 @@ type AuthenticationInfo struct {
 
 	/**
 	 * 認証されたユーザー情報
-	 * 認証されなければとなる。
+	 * 認証されなければnil(匿名)となる。
 	 */
 	User                *UserInfo
 }

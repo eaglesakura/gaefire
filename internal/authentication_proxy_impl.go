@@ -16,7 +16,6 @@ import (
 	"google.golang.org/appengine"
 	"encoding/base64"
 	"google.golang.org/appengine/log"
-	"github.com/eaglesakura/swagger-go-core/swag-port"
 )
 
 var (
@@ -198,6 +197,10 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 	return nil
 }
 
+func stringPtr(value string) *string {
+	return &value
+}
+
 func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtString string, result *gaefire.AuthenticationInfo) error {
 	token, _ := jwt.Parse(jwtString, nil)
 	if token == nil || token.Claims == nil {
@@ -245,17 +248,17 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 			result.ServiceAccountToken = serviceJwt
 			result.User = &gaefire.UserInfo{}
 			if email, err := validToken.GetClaim("email"); err == nil {
-				result.User.Email = swag_port.String(fmt.Sprintf("%v", email))
+				result.User.Email = stringPtr(fmt.Sprintf("%v", email))
 			}
 
 			if aud, err := validToken.GetClaim("aud"); err == nil {
-				result.Audience = swag_port.String(fmt.Sprintf("%v", aud))
+				result.Audience = stringPtr(fmt.Sprintf("%v", aud))
 			}
 
 			if user_id, err := validToken.GetClaim("user_id"); err == nil {
-				result.User.Id = swag_port.String(fmt.Sprintf("%v", user_id))
+				result.User.Id = stringPtr(fmt.Sprintf("%v", user_id))
 			} else if uid, err := validToken.GetClaim("uid"); err == nil {
-				result.User.Id = swag_port.String(fmt.Sprintf("%v", uid))
+				result.User.Id = stringPtr(fmt.Sprintf("%v", uid))
 			}
 		}
 	}
