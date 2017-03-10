@@ -7,7 +7,7 @@ import (
 )
 
 func newTestSwaggerJson() SwaggerJsonModel {
-	if buf, err := NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
+	if buf, err := NewAssetManager().LoadFile("assets/swagger.json"); err != nil {
 		panic(err)
 	} else {
 		result := SwaggerJsonModel{}

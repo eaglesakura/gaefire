@@ -19,9 +19,7 @@ func newTestWebApp() gaefire.WebApplication {
 
 func newOAuthTestData() UserOAuthTestData {
 	result := UserOAuthTestData{}
-	if jsonBuf, err := NewAssetManager().LoadFile("private/oauth-test-token.json"); err != nil {
-		panic(err)
-	} else {
+	if jsonBuf, err := NewAssetManager().LoadFile("private/oauth-test-token.json"); err == nil {
 		json.Unmarshal(jsonBuf, &result)
 	}
 	return result

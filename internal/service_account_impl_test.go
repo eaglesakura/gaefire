@@ -17,7 +17,7 @@ func newTestServiceAccount() gaefire.ServiceAccount {
 }
 
 func newTestSwaggerJsonBinary() []byte {
-	if buf, err := NewAssetManager().LoadFile("www/swagger/swagger.json"); err != nil {
+	if buf, err := NewAssetManager().LoadFile("assets/swagger.json"); err != nil {
 		panic(err)
 	} else {
 		return buf
