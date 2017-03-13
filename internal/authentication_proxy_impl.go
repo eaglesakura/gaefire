@@ -311,7 +311,7 @@ func (it *AuthenticationProxyImpl)validAuthentication(ctx context.Context, r *ht
 /**
  * ユーザー認証を行い、必要に応じてhttpリクエストを改変する。
  */
-func (it *AuthenticationProxyImpl)Authentication(ctx context.Context, r *http.Request) (*gaefire.AuthenticationInfo, error) {
+func (it *AuthenticationProxyImpl)Verify(ctx context.Context, r *http.Request) (*gaefire.AuthenticationInfo, error) {
 	for _, key := range SecurityCheckHeaders {
 		value := r.Header.Get(key)
 		// セキュリティ上許されないヘッダを見つけた

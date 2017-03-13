@@ -39,5 +39,5 @@ type AuthenticationProxy interface {
 	 *
 	 * このAPIを使用するためには、事前にswagger.json(openapi.json)を `gcloud service-management deploy path/to/swagger.[yaml|json]` でデプロイしておく必要がある。
 	 */
-	Authentication(ctx context.Context, r *http.Request) (*AuthenticationInfo, error)
+	Verify(ctx context.Context, r *http.Request) (*AuthenticationInfo, error)
 }

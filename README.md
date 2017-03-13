@@ -314,7 +314,7 @@ GAE/Fireが検証するのは次の `Authorization` ヘッダとAPI Keyです。
  Http Requestに対して正しい認証が行われているかを確認することができます。
  例として、次のような認証はerrorとして扱います。
 
-  * Authorization()を行う前に `X-Endpoint-API-UserInfo` Headerが存在している場合
+  * Verify()を行う前に `X-Endpoint-API-UserInfo` Headerが存在している場合
   * `x-google-audiences` にて指定されないaudienceに対するOAuth2 Token
   * `x-google-issuer` に指定されないissuerが発行したJson Web Token
   * Service AccountもしくはGoogle以外が署名したjson-web-token
@@ -383,7 +383,7 @@ func VerifyHttpRequest(ctx context.Context, request *http.Request) (*gaefire.Aut
   serviceAccount := factory.NewServiceAccount(serviceAccountJson)
   authenticationProxy := factory.NewAuthenticationProxy(serviceAccount, swaggerJson)
 
-  authInfo, err := authenticationProxy.Authorization(ctx, request)
+  authInfo, err := authenticationProxy.Verify(ctx, request)
   if err == nil {
       if authInfo.User == nil {
         // Anonymous user.
