@@ -213,7 +213,7 @@ Google Play Service等の認証SDKと組み合わせることで、サーバー�
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_secret": "your-client-secret",
     "redirect_uris": [
-      "https://dev-alert-tag.firebaseapp.com/__/auth/handler"
+      "https://your-gcp-project-name.firebaseapp.com/__/auth/handler"
     ],
     "javascript_origins": [
       "http://localhost",
