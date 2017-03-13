@@ -73,11 +73,4 @@ type ServiceAccount interface {
 	 * OAuth2トークンはMemcacheにキャッシュされ、再取得は最低限となるよう実装される。
 	 */
 	GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (OAuth2Token, error)
-
-	/**
-	 * 認証サポート用のProxyを生成する。
-	 * 認証情報はswagger.jsonを元にパースされる。
-	 * パースに失敗した場合はnilが返却される
-	 */
-	NewAuthenticationProxy(swaggerJson []byte) AuthenticationProxy
 }

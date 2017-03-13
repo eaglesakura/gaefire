@@ -1,9 +1,10 @@
-package gaefire
+package factory
 
 import (
 	gaefire_internal "github.com/eaglesakura/gaefire/internal"
 	"net/http"
 	"github.com/eaglesakura/gaefire"
+	"encoding/json"
 )
 
 
@@ -39,4 +40,21 @@ func NewServiceAccount(serviceAccountJson []byte) gaefire.ServiceAccount {
  */
 func NewWebApplication(webAppJson []byte) gaefire.WebApplication {
 	return gaefire_internal.NewWebApplication(webAppJson)
+}
+
+/**
+ * 認証サポート用のProxyを生成する。
+ * 認証情報はswagger.jsonを元にパースされる。
+ * パースに失敗した場合はnilが返却される
+ */
+func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, swaggerJson []byte) gaefire.AuthenticationProxy {
+	result := &gaefire_internal.AuthenticationProxyImpl{
+		ServiceAccount:serviceAccount,
+	}
+
+	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
+		return nil
+	}
+
+	return result
 }

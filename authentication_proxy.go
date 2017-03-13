@@ -37,7 +37,7 @@ type AuthenticationProxy interface {
 	 * Example
 	 * curl -H "Autorization: Bearer {token}" http://host.example.com/path/to/api?key={API Key}
 	 *
-	 * このAPIを使用するためには、事前にswagger.json(openapi.json)を `gcloud service-management deploy path/to/swagger.json` でデプロイしておく必要がある。
+	 * このAPIを使用するためには、事前にswagger.json(openapi.json)を `gcloud service-management deploy path/to/swagger.[yaml|json]` でデプロイしておく必要がある。
 	 */
 	Authentication(ctx context.Context, r *http.Request) (*AuthenticationInfo, error)
 }
