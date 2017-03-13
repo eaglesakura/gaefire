@@ -248,7 +248,7 @@ void resultGoogleAuth(int result, Intent data) {
 
       String googleIdToken = signInAccount.getIdToken();
       String serverAuthCode = signInAccount.getServerAuthCode();
-      // curl -H "Authorization: Bearer {token}"  https://your-gcp-project-name.appspot.com/path/to/api?serverAuthCode={serverAuthCode}
+      // curl -H "Authorization: Bearer {googleIdToken}"  https://your-gcp-project-name.appspot.com/path/to/api?serverAuthCode={serverAuthCode}
   } else {
     // login failed.
   }
@@ -293,7 +293,8 @@ func GetUserAccountToken(ctx context.Context, refreshCode string) (gaefire.OAuth
 ```go
 import "github.com/eaglesakura/gaefire"
 
-// OAuth2Token オブジェクトを直接利用する場合
+// OAuth2Token オブジェクトを直接利用する
+// この方法の場合、キャッシュを利用せず強制的にAccessTokenを交換する
 func RefreshOAuth2Token(ctx context.Context, token *gaefire.OAuth2Token, clientId string, clientSecret string) error {
   return token.Refresh(ctx, clientId, clientSecret)
 }
