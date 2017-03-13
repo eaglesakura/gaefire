@@ -311,21 +311,21 @@ GAE/Fireが検証するのは次の `Authorization` ヘッダとAPI Keyです。
  * `Authorization: Bearer {google-oauth2-token}`
  * API Key(query|header)
 
- Http Requestに対して正しい認証が行われているかを確認することができます。
- 例として、次のような認証はerrorとして扱います。
+Http Requestに対して正しい認証が行われているかを確認することができます。
+例として、次のような認証はerrorとして扱います。
 
-  * Verify()を行う前に `X-Endpoint-API-UserInfo` Headerが存在している場合
-  * `x-google-audiences` にて指定されないaudienceに対するOAuth2 Token
-  * `x-google-issuer` に指定されないissuerが発行したJson Web Token
-  * Service AccountもしくはGoogle以外が署名したjson-web-token
-  * Google Cloud Platform Consoleに登録されないAPI Key
-  * expireされているjson-web-token
-  * expireされているOAuth2 Token
+ * Verify()を行う前に `X-Endpoint-API-UserInfo` Headerが存在している場合
+ * `x-google-audiences` にて指定されないaudienceに対するOAuth2 Token
+ * `x-google-issuer` に指定されないissuerが発行したJson Web Token
+ * Service AccountもしくはGoogle以外が署名したjson-web-token
+ * Google Cloud Platform Consoleに登録されないAPI Key
+ * expireされているjson-web-token
+ * expireされているOAuth2 Token
 
- 下記はエラーとして扱いません。
+下記はエラーとして扱いません。
 
-  * API Keyを指定していない場合
-  * `Authentication` ヘッダが存在しない場合
+ * API Keyを指定していない場合
+ * `Authentication` ヘッダが存在しない場合
 
 
 ### Setup
