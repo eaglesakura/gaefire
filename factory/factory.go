@@ -4,7 +4,6 @@ import (
 	gaefire_internal "github.com/eaglesakura/gaefire/internal"
 	"net/http"
 	"github.com/eaglesakura/gaefire"
-	"encoding/json"
 )
 
 
@@ -48,13 +47,5 @@ func NewWebApplication(webAppJson []byte) gaefire.WebApplication {
  * パースに失敗した場合はnilが返却される
  */
 func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, swaggerJson []byte) gaefire.AuthenticationProxy {
-	result := &gaefire_internal.AuthenticationProxyImpl{
-		ServiceAccount:serviceAccount,
-	}
-
-	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
-		return nil
-	}
-
-	return result
+	return gaefire_internal.NewAuthenticationProxy(serviceAccount, swaggerJson)
 }

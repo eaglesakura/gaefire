@@ -78,6 +78,22 @@ type AuthenticationProxyImpl struct {
 }
 
 /**
+ * 認証サポート用のProxyを生成する。
+ * 認証情報はswagger.jsonを元にパースされる。
+ * パースに失敗した場合はnilが返却される
+ */
+func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, swaggerJson []byte) gaefire.AuthenticationProxy {
+	result := &AuthenticationProxyImpl{
+		ServiceAccount:serviceAccount,
+	}
+
+	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
+		return nil
+	}
+
+	return result
+}
+/**
  * API Keyが入力されている場合、APIキーの妥当性をチェックする
  */
 func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {

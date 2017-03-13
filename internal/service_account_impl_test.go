@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
-	"github.com/eaglesakura/gaefire/factory"
 )
 
 func newTestServiceAccount() gaefire.ServiceAccount {
@@ -148,6 +147,6 @@ func TestAuthProxy_Create(t *testing.T) {
 
 	service := newTestServiceAccount()
 
-	proxy := factory.NewAuthenticationProxy(service, newTestSwaggerJsonBinary())
+	proxy := NewAuthenticationProxy(service, newTestSwaggerJsonBinary())
 	assert.NotNil(t, proxy)
 }
