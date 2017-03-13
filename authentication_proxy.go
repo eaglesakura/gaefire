@@ -27,11 +27,15 @@ type AuthenticationProxy interface {
 	 *
 	 * APIKeyの場合、query|headerからGet(${Key})するときのKeyにはswagger.jsonで指定されるapi_keyのnameが使用される。
 	 *
-	 * in:query key={your.gcp.api_key}
-	 * in:header "Authorization: key: {your.gcp.api_key}"
+	 * in:query {key name}={your.gcp.api_key}
+	 * in:header "{key name}: {your.gcp.api_key}"
 	 * in:header "Authorization: Bearer {your.oauth2.token}"
 	 * in:header "Authorization: Bearer {google.json.web.token}"
 	 * in:header "Authorization: Bearer {firebase.json.web.token}"
+	 * in:header "Authorization: Bearer {service.account.json.web.token}"
+	 *
+	 * Example
+	 * curl -H "Autorization: Bearer {token}" http://host.example.com/path/to/api?key={API Key}
 	 *
 	 * このAPIを使用するためには、事前にswagger.json(openapi.json)を `gcloud service-management deploy path/to/swagger.json` でデプロイしておく必要がある。
 	 */
