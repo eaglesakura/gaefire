@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"errors"
 	"encoding/json"
-	"io/ioutil"
 	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/log"
 	"github.com/dgrijalva/jwt-go"
@@ -198,7 +197,7 @@ func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenVerifier(ctx context.Co
  */
 func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
 	client := urlfetch.Client(ctx)
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
+	resp, err := client.Head("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
 	defer resp.Body.Close()
 
 	if err != nil {
@@ -206,12 +205,16 @@ func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Cont
 		return nil
 	}
 
-	buf, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		// 少なくともGoogleが発行したトークンでは無いので、無効である
+		return &JsonWebTokenVerifierStubImpl{
+		}
+	}
 
 	return &JsonWebTokenVerifierImpl{
 		service:it,
 		ctx:ctx,
-		token:string(buf),
+		token:jwt,
 	}
 }
 

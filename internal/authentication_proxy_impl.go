@@ -72,6 +72,11 @@ type AuthenticationProxyImpl struct {
 	ServiceAccount gaefire.ServiceAccount
 
 	/**
+	 * 認証オプション
+	 */
+	Option         gaefire.AuthenticationProxyOption
+
+	/**
 	 * セキュリティチェックソースとなるSwagger情報
 	 */
 	Swagger        SwaggerJsonModel
@@ -82,13 +87,17 @@ type AuthenticationProxyImpl struct {
  * 認証情報はswagger.jsonを元にパースされる。
  * パースに失敗した場合はnilが返却される
  */
-func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, swaggerJson []byte) gaefire.AuthenticationProxy {
+func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefire.AuthenticationProxyOption, swaggerJson []byte) gaefire.AuthenticationProxy {
 	result := &AuthenticationProxyImpl{
 		ServiceAccount:serviceAccount,
 	}
 
 	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
 		return nil
+	}
+
+	if (len(option.EndpointsId) == 0) {
+		option.EndpointsId = result.Swagger.Host
 	}
 
 	return result
@@ -132,8 +141,9 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 		return err
 	}
 
+	log.Debugf(ctx, "Endpoints[%v]", it.Option.EndpointsId)
 	var request *http.Request
-	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/" + it.Swagger.Host + ":check", bytes.NewReader(buf)); err != nil {
+	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/" + it.Option.EndpointsId + ":check", bytes.NewReader(buf)); err != nil {
 		return err
 	} else {
 		req.Header.Add("Content-Type", "application/json")

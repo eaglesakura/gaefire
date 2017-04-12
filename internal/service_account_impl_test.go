@@ -147,6 +147,6 @@ func TestAuthProxy_Create(t *testing.T) {
 
 	service := newTestServiceAccount()
 
-	proxy := NewAuthenticationProxy(service, newTestSwaggerJsonBinary())
+	proxy := NewAuthenticationProxy(service, gaefire.AuthenticationProxyOption{}, newTestSwaggerJsonBinary())
 	assert.NotNil(t, proxy)
 }

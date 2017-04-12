@@ -68,7 +68,7 @@ import "github.com/eaglesakura/gaefire/factory"
 
 func NewCustomAuthToken(newUserId string) string {
   var serviceAccountJson []byte
-  serviceAccountJson = ... // load from service-account.json
+  serviceAccountJson = ... firebase-admin.json
 
   serviceAccount := factory.NewServiceAccount(serviceAccountJson)
   token, err :=  serviceAccount.NewFirebaseAuthTokenGenerator(newUserId).Generate()

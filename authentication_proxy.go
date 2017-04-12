@@ -9,6 +9,16 @@ const (
 	HttpXHeaderUserInfo string = "X-Endpoint-API-UserInfo"
 )
 
+type AuthenticationProxyOption struct {
+	/**
+	 * APIKey妥当性チェックを行う際のIDを指定する
+	 * 事前に`gcloud service-management deploy path/to/swagger.[yaml|json]` でデプロイしておく必要がある
+	 *
+	 * https://servicecontrol.googleapis.com/v1/services/${EndpointsCheckId}:check でバリデーションを行う。
+	 */
+	EndpointsId string
+}
+
 /**
  * httpリクエストに対し、ユーザー認証のチェックを行う。
  *
