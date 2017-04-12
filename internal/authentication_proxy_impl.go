@@ -96,8 +96,9 @@ func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefir
 		return nil
 	}
 
+	result.Option = option
 	if (len(option.EndpointsId) == 0) {
-		option.EndpointsId = result.Swagger.Host
+		result.Option.EndpointsId = result.Swagger.Host
 	}
 
 	return result
@@ -134,7 +135,8 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 	buf, _ := json.Marshal(model)
 
 	accessToken, err := it.ServiceAccount.GetServiceAccountToken(ctx,
-		"https://www.googleapis.com/auth/service.management",
+		//"https://www.googleapis.com/auth/cloud-platform",
+		//"https://www.googleapis.com/auth/service.management",
 		"https://www.googleapis.com/auth/servicecontrol")
 	if err != nil {
 		log.Errorf(ctx, "ServiceAccount token failed")
