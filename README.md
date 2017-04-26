@@ -265,7 +265,7 @@ func NewUserOAuth2Token(ctx context.Context, serverAuthCode string) (gaefire.OAu
   webApplicationJson = ... // load from web-application.json
 
   webApplication := factory.NewWebApplication(webApplicationJson)
-  return serviceAccount.NewUserAccountToken(ctx, serverAuthCode)
+  return webApplication.NewUserAccountToken(ctx, serverAuthCode)
 }
 ```
 
