@@ -229,3 +229,16 @@ func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context,
 	}
 	return token.GetToken()
 }
+
+/**
+ * Service Accountとして認証するためのOAuth2トークンを生成する
+ * この生成結果はキャッシュされず、必ず新しいものとなる
+ */
+func (it *FirebaseServiceAccountImpl)NewServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
+	token := &OAuth2RefreshRequest{ctx:ctx, serviceAccount:it }
+	token.AddScope(scope)
+	for _, value := range addScopes {
+		token.AddScope(value)
+	}
+	return token._newServiceOauth2Token()
+}

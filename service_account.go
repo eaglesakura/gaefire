@@ -73,4 +73,11 @@ type ServiceAccount interface {
 	 * OAuth2トークンはMemcacheにキャッシュされ、再取得は最低限となるよう実装される。
 	 */
 	GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (OAuth2Token, error)
+
+	/**
+	 * Service Accountとして認証するためのOAuth2トークンを取得する
+	 *
+	 * この生成結果はキャッシュされず、必ず新しいものとなる
+	 */
+	NewServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (OAuth2Token, error)
 }
