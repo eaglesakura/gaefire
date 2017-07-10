@@ -11,7 +11,6 @@ import (
 	"net/url"
 
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/log"
 )
 

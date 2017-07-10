@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"errors"
 	"encoding/json"
-	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/log"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/net/context"

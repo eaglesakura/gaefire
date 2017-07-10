@@ -6,7 +6,6 @@ import (
 	"github.com/eaglesakura/swagger-go-core/errors"
 	"fmt"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/urlfetch"
 	"time"
 	"encoding/json"
 	"bytes"
