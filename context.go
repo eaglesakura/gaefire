@@ -2,7 +2,6 @@ package gaefire
 
 import "golang.org/x/net/context"
 
-
 /**
  * 通常request時のContextと、aetestを使ったUnitTestのContextのラップを行なう
  */

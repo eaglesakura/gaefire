@@ -1,12 +1,12 @@
 package gaefire
 
 import (
-	"time"
+	"encoding/json"
 	"fmt"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/memcache"
 	"google.golang.org/appengine/log"
-	"encoding/json"
+	"google.golang.org/appengine/memcache"
+	"time"
 )
 
 /**
@@ -16,7 +16,7 @@ type KindInfo struct {
 	/**
 	 * Kind名, Keyの一部に利用される
 	 */
-	Name    string
+	Name string
 
 	/**
 	 * バージョン番号, Keyの一部に利用される
@@ -33,41 +33,41 @@ type MemcacheLoadRequest struct {
 
 func NewMemcacheRequest(ctx context.Context) *MemcacheLoadRequest {
 	return &MemcacheLoadRequest{
-		ctx:ctx,
-		kind:KindInfo{Name:"Default", Version:1},
+		ctx:  ctx,
+		kind: KindInfo{Name: "Default", Version: 1},
 	}
 }
 
-func (it *MemcacheLoadRequest)SetExpireDate(date time.Time) *MemcacheLoadRequest {
+func (it *MemcacheLoadRequest) SetExpireDate(date time.Time) *MemcacheLoadRequest {
 	it.expireDate = &date
 	return it
 }
 
-func (it *MemcacheLoadRequest)SetKindInfo(kind KindInfo) *MemcacheLoadRequest {
+func (it *MemcacheLoadRequest) SetKindInfo(kind KindInfo) *MemcacheLoadRequest {
 	it.kind = kind
 	return it
 }
 
-func (it *MemcacheLoadRequest)SetId(id string) *MemcacheLoadRequest {
+func (it *MemcacheLoadRequest) SetId(id string) *MemcacheLoadRequest {
 	it.uniqueId = id
 	return it
 }
 
-func (it *MemcacheLoadRequest)getKey() string {
+func (it *MemcacheLoadRequest) getKey() string {
 	return fmt.Sprintf("internal.gaefire.%v:%v.%v", it.kind.Name, it.kind.Version, it.uniqueId)
 }
 
-func (it *MemcacheLoadRequest)Save(value interface{}) error {
+func (it *MemcacheLoadRequest) Save(value interface{}) error {
 	key := it.getKey()
 	buf, err := json.Marshal(value)
 	if err != nil {
 		log.Debugf(it.ctx, "Marshal error[%v]", key)
-		return &DatastoreError{message:"Parse failed", errors:[]error{err}}
+		return &DatastoreError{message: "Parse failed", errors: []error{err}}
 	}
 
 	item := &memcache.Item{
-		Key:key,
-		Value:buf,
+		Key:   key,
+		Value: buf,
 	}
 
 	if it.expireDate != nil {
@@ -77,9 +77,9 @@ func (it *MemcacheLoadRequest)Save(value interface{}) error {
 	return memcache.Set(it.ctx, item)
 }
 
-func (it *MemcacheLoadRequest)Load(result interface{}, createFunc func(result interface{}) error) error {
+func (it *MemcacheLoadRequest) Load(result interface{}, createFunc func(result interface{}) error) error {
 	key := it.getKey()
-	item, err := memcache.Get(it.ctx, key);
+	item, err := memcache.Get(it.ctx, key)
 
 	if err == nil {
 		// デコードを行わせる

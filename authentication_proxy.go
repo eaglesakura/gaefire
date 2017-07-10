@@ -1,8 +1,8 @@
 package gaefire
 
 import (
-	"net/http"
 	"golang.org/x/net/context"
+	"net/http"
 )
 
 const (

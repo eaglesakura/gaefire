@@ -5,6 +5,6 @@ type DatastoreError struct {
 	errors  []error
 }
 
-func (it *DatastoreError)Error() string {
+func (it *DatastoreError) Error() string {
 	return it.message
 }
