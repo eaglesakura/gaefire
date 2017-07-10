@@ -154,7 +154,7 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		accessToken.Authorize(req)
 		request = req
 	}
-	resp, err := urlfetch.Client(ctx).Do(request)
+	resp, err := newHttpClient(ctx).Do(request)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	}

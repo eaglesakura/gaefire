@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type OAuth2Token struct {
@@ -59,7 +60,7 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 		return false
 	}
 
-	resp, err := urlfetch.Client(ctx).Get("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + it.AccessToken)
+	resp, err := newHttpClient(ctx).Get("https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + it.AccessToken)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	}
@@ -94,6 +95,19 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 	return true
 }
 
+func newHttpClient(ctx context.Context) *http.Client {
+	result := &http.Client{
+		Transport: &urlfetch.Transport{
+			Context: ctx,
+		},
+	}
+
+	// タイムアウトを30秒に延長
+	result.Timeout = 30 * time.Second
+
+	return result
+}
+
 /**
  * OAuth2トークンをリフレッシュする。
  *
@@ -111,7 +125,7 @@ func (it *OAuth2Token) Refresh(ctx context.Context, clientId string, clientSecre
 	values.Add("client_secret", clientSecret)
 	values.Add("grant_type", "refresh_token")
 	values.Add("refresh_token", it.RefreshToken)
-	resp, err := urlfetch.Client(ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
+	resp, err := newHttpClient(ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	} else {

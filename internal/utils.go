@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"crypto/md5"
 	"encoding/hex"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/urlfetch"
+	"time"
 )
 
 const (
@@ -39,4 +42,17 @@ func GenMD5(text string) string {
 	hash := md5.New()
 	hash.Write([]byte(text))
 	return hex.EncodeToString(hash.Sum(nil))
+}
+
+func newHttpClient(ctx context.Context) *http.Client {
+	result := &http.Client{
+		Transport: &urlfetch.Transport{
+			Context: ctx,
+		},
+	}
+
+	// タイムアウトを30秒に延長
+	result.Timeout = 30 * time.Second
+
+	return result
 }

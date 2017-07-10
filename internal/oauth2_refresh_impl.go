@@ -76,7 +76,7 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, er
 	values := url.Values{}
 	values.Add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
 	values.Add("assertion", jwtToken)
-	resp, err := urlfetch.Client(it.ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
+	resp, err := newHttpClient(it.ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	} else {
@@ -120,7 +120,7 @@ func (it *OAuth2RefreshRequest)_newUserOauth2Token() (gaefire.OAuth2Token, error
 		values.Add("client_secret", it.webApplication.GetClientSecret())
 		values.Add("grant_type", "authorization_code")
 		values.Add("code", it.accessCode)
-		resp, err := urlfetch.Client(it.ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
+		resp, err := newHttpClient(it.ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
 		if resp != nil && resp.Body != nil {
 			defer resp.Body.Close()
 		} else {

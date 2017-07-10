@@ -74,7 +74,7 @@ func (it *PublicKeystore)FindPublicKey(kid string) (*rsa.PublicKey, error) {
 func (it *PublicKeystore)Refresh(ctx context.Context) error {
 
 	// download public keys
-	resp, err := urlfetch.Client(ctx).Get(it.refreshUrl)
+	resp, err := newHttpClient(ctx).Get(it.refreshUrl)
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	}
