@@ -45,9 +45,12 @@ func GenMD5(text string) string {
 }
 
 func newHttpClient(ctx context.Context) *http.Client {
+
+	deadline, _ := context.WithTimeout(ctx, 30*time.Second)
+
 	result := &http.Client{
 		Transport: &urlfetch.Transport{
-			Context: ctx,
+			Context: deadline,
 		},
 	}
 
