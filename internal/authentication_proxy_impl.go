@@ -30,18 +30,18 @@ var (
  * https://servicemanagement.googleapis.com/v1/services/{ENDPOINTS_SERVICE_NAME}/configs/{ENDPOINTS_SERVICE_VERSION}
  */
 type SwaggerJsonModel struct {
-	Host                string `json:"host"`
+	Host string `json:"host"`
 
 	SecurityDefinitions struct {
-				    ApiKey        *struct {
-					    Name string `json:"name"`
-					    In   string `json:"in"`
-				    }`json:"api_key,omitempty"`
-				    GoogleIdToken *struct {
-					    Issuer    string `json:"x-google-issuer"`
-					    Audiences []string `json:"x-google-audiences"`
-				    }`json:"google_id_token,omitempty"`
-			    }`json:"securityDefinitions"`
+		ApiKey *struct {
+			Name string `json:"name"`
+			In   string `json:"in"`
+		}`json:"api_key,omitempty"`
+		GoogleIdToken *struct {
+			Issuer    string `json:"x-google-issuer"`
+			Audiences []string `json:"x-google-audiences"`
+		}`json:"google_id_token,omitempty"`
+	}`json:"securityDefinitions"`
 }
 
 /**
@@ -49,17 +49,17 @@ type SwaggerJsonModel struct {
  */
 type ServiceCheckModel struct {
 	Operation struct {
-			  OperationId   string `json:"operationId"`
-			  OperationName string `json:"operationName"`
-			  ConsumerId    string `json:"consumerId"`
-			  StartTime     string `json:"startTime"`
-		  }`json:"operation"`
+		OperationId   string `json:"operationId"`
+		OperationName string `json:"operationName"`
+		ConsumerId    string `json:"consumerId"`
+		StartTime     string `json:"startTime"`
+	}`json:"operation"`
 }
 
 type ServiceCheckResultModel struct {
 	OperationId     string `json:"operationId"`
 	ServiceConfigId string `json:"serviceConfigId"`
-	CheckErrors     *[]struct {
+	CheckErrors *[]struct {
 		Code   string `json:"code"`
 		Detail string `json:"detail"`
 	}`json:"checkErrors,omitempty"`
@@ -74,12 +74,12 @@ type AuthenticationProxyImpl struct {
 	/**
 	 * 認証オプション
 	 */
-	Option         gaefire.AuthenticationProxyOption
+	Option gaefire.AuthenticationProxyOption
 
 	/**
 	 * セキュリティチェックソースとなるSwagger情報
 	 */
-	Swagger        SwaggerJsonModel
+	Swagger SwaggerJsonModel
 }
 
 /**
@@ -89,7 +89,7 @@ type AuthenticationProxyImpl struct {
  */
 func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefire.AuthenticationProxyOption, swaggerJson []byte) gaefire.AuthenticationProxy {
 	result := &AuthenticationProxyImpl{
-		ServiceAccount:serviceAccount,
+		ServiceAccount: serviceAccount,
 	}
 
 	if err := json.Unmarshal(swaggerJson, &result.Swagger); err != nil {
@@ -103,10 +103,11 @@ func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefir
 
 	return result
 }
+
 /**
  * API Keyが入力されている場合、APIキーの妥当性をチェックする
  */
-func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
+func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
 	if it.Swagger.SecurityDefinitions.ApiKey == nil {
 		// API Keyはチェック対象ではない
 		return nil
@@ -145,7 +146,7 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 
 	log.Debugf(ctx, "Endpoints[%v]", it.Option.EndpointsId)
 	var request *http.Request
-	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/" + it.Option.EndpointsId + ":check", bytes.NewReader(buf)); err != nil {
+	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/"+it.Option.EndpointsId+":check", bytes.NewReader(buf)); err != nil {
 		return err
 	} else {
 		req.Header.Add("Content-Type", "application/json")
@@ -159,7 +160,11 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 	}
 
 	if err != nil || resp.StatusCode != 200 {
-		log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
+		if resp != nil {
+			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
+		} else {
+			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[nil]", apiKey, accessToken.AccessToken)
+		}
 		log.Errorf(ctx, "  - post body[%v]", string(buf))
 		return errors.New(http.StatusForbidden, "ApiKey check error")
 	}
@@ -183,9 +188,9 @@ func (it *AuthenticationProxyImpl)validApiKey(ctx context.Context, r *http.Reque
 	return nil
 }
 
-func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization string, result *gaefire.AuthenticationInfo) error {
+func (it *AuthenticationProxyImpl) validOAuth2(ctx context.Context, authorization string, result *gaefire.AuthenticationInfo) error {
 	// OAuth2 Tokenである
-	token := gaefire.OAuth2Token{TokenType:"Bearer", AccessToken:authorization}
+	token := gaefire.OAuth2Token{TokenType: "Bearer", AccessToken: authorization}
 	if !token.Valid(ctx) {
 		log.Errorf(ctx, "Invalid OAuth2 token[%v]", authorization)
 		return errors.New(http.StatusForbidden, "Invalid oauth2 token")
@@ -209,7 +214,7 @@ func (it *AuthenticationProxyImpl)validOAuth2(ctx context.Context, authorization
 		// 許可済のaudを見つけられなかった
 		// 恐らく、このトークンはこのプロジェクトのために用意されたものでは無いだろう
 		log.Errorf(ctx, "User OAuth2 check error aud[%v]", token.Audience)
-		return errors.New(http.StatusForbidden, "Not supported oauth2 aud :: " + token.Audience)
+		return errors.New(http.StatusForbidden, "Not supported oauth2 aud :: "+token.Audience)
 	}
 
 	result.OAuth2Token = &authorization
@@ -229,7 +234,7 @@ func stringPtr(value string) *string {
 	return &value
 }
 
-func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtString string, result *gaefire.AuthenticationInfo) error {
+func (it *AuthenticationProxyImpl) validJsonWebToken(ctx context.Context, jwtString string, result *gaefire.AuthenticationInfo) error {
 	token, _ := jwt.Parse(jwtString, nil)
 	if token == nil || token.Claims == nil {
 		return errors.New(http.StatusForbidden, "Token not supported format")
@@ -297,7 +302,7 @@ func (it *AuthenticationProxyImpl)validJsonWebToken(ctx context.Context, jwtStri
 /**
  * 認証情報をチェックする
  */
-func (it *AuthenticationProxyImpl)validAuthentication(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
+func (it *AuthenticationProxyImpl) validAuthentication(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
 	authorization := r.Header.Get("Authorization")
 	if len(authorization) == 0 {
 		// 認証は必要ない
@@ -319,11 +324,10 @@ func (it *AuthenticationProxyImpl)validAuthentication(ctx context.Context, r *ht
 	}
 }
 
-
 /**
  * ユーザー認証を行い、必要に応じてhttpリクエストを改変する。
  */
-func (it *AuthenticationProxyImpl)Verify(ctx context.Context, r *http.Request) (*gaefire.AuthenticationInfo, error) {
+func (it *AuthenticationProxyImpl) Verify(ctx context.Context, r *http.Request) (*gaefire.AuthenticationInfo, error) {
 	for _, key := range SecurityCheckHeaders {
 		value := r.Header.Get(key)
 		// セキュリティ上許されないヘッダを見つけた

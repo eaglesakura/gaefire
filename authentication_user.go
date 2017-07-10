@@ -5,9 +5,9 @@ package gaefire
  * Google Cloud Endpoints 2.0互換のModelとなる。
  */
 type UserInfo struct {
-	Issuer *string        `json:"issuer"`
-	Id     *string        `json:"id"`
-	Email  *string        `json:"email"`
+	Issuer *string `json:"issuer"`
+	Id     *string `json:"id"`
+	Email  *string `json:"email"`
 }
 
 /**
@@ -18,25 +18,25 @@ type AuthenticationInfo struct {
 	 * "iss"に相当する要素が含まれている場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	Issuer              *string
+	Issuer *string
 
 	/**
 	 * "aud","audience"に相当する要素が含まれている場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	Audience            *string
+	Audience *string
 
 	/**
 	 * API Keyが使われた場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	ApiKey              *string
+	ApiKey *string
 
 	/**
 	 * Firebaseが署名したTokenが使用された場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	FirebaseToken       *string
+	FirebaseToken *string
 
 	/**
 	 * Firebase Service Accountが署名したTokenが使用された場合にsetされる
@@ -48,17 +48,17 @@ type AuthenticationInfo struct {
 	 * Google Tokenが使用された場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	GoogleIdToken       *string
+	GoogleIdToken *string
 
 	/**
 	 * OAuth2 Tokenが使用された場合にsetされる
 	 * nil以外の場合、len()は必ず1以上となる。
 	 */
-	OAuth2Token         *string
+	OAuth2Token *string
 
 	/**
 	 * 認証されたユーザー情報
 	 * 認証されなければnil(匿名)となる。
 	 */
-	User                *UserInfo
+	User *UserInfo
 }

@@ -1,13 +1,13 @@
 package gaefire
 
 import (
-	"net/http"
-	"io/ioutil"
-	"errors"
 	"encoding/json"
+	"errors"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/urlfetch"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 )
 
@@ -15,22 +15,22 @@ type OAuth2Token struct {
 	/**
 	 * mail
 	 */
-	Email        string `json:"email,omitempty"`
+	Email string `json:"email,omitempty"`
 
 	/**
 	 * Access scopes
 	 */
-	Scopes       string `json:"scope,omitempty"`
+	Scopes string `json:"scope,omitempty"`
 
 	/**
 	 * OAuth2 Access Token
 	 */
-	AccessToken  string `json:"access_token,omitempty"`
+	AccessToken string `json:"access_token,omitempty"`
 
 	/**
 	 * Token Type "Bearer"
 	 */
-	TokenType    string `json:"token_type,omitempty"`
+	TokenType string `json:"token_type,omitempty"`
 
 	/**
 	 * OAuth2 Refresh token
@@ -40,22 +40,21 @@ type OAuth2Token struct {
 	/**
 	 * OAuth2 aud
 	 */
-	Audience     string `json:"aud,omitempty"`
+	Audience string `json:"aud,omitempty"`
 }
 
 /**
  * http requestに認証を行なう
  */
-func (it *OAuth2Token)Authorize(req *http.Request) {
-	req.Header.Set("Authorization", it.TokenType + " " + it.AccessToken)
+func (it *OAuth2Token) Authorize(req *http.Request) {
+	req.Header.Set("Authorization", it.TokenType+" "+it.AccessToken)
 }
-
 
 /**
  * トークンが有効であればtrue
  * ただし、有効期限のチェックを行わない。
  */
-func (it *OAuth2Token)Valid(ctx context.Context) bool {
+func (it *OAuth2Token) Valid(ctx context.Context) bool {
 	if len(it.AccessToken) == 0 || len(it.TokenType) == 0 {
 		return false
 	}
@@ -101,7 +100,7 @@ func (it *OAuth2Token)Valid(ctx context.Context) bool {
  * ただし、it.RefreshTokenが含まれていない場合、リフレッシュは行えない。
  * また、ユーザーが明示的にアクセス権限を取り消している場合もトークンを取り出すことはできない。
  */
-func (it *OAuth2Token)Refresh(ctx context.Context, clientId string, clientSecret string) error {
+func (it *OAuth2Token) Refresh(ctx context.Context, clientId string, clientSecret string) error {
 	if len(it.RefreshToken) == 0 {
 		return errors.New("refresh token empty")
 	}
@@ -113,7 +112,7 @@ func (it *OAuth2Token)Refresh(ctx context.Context, clientId string, clientSecret
 	values.Add("grant_type", "refresh_token")
 	values.Add("refresh_token", it.RefreshToken)
 	resp, err := urlfetch.Client(ctx).PostForm("https://www.googleapis.com/oauth2/v4/token", values)
-	if (resp != nil && resp.Body != nil) {
+	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	} else {
 		log.Errorf(ctx, "Https error %v", err.Error())
