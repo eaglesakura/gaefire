@@ -159,7 +159,7 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		defer resp.Body.Close()
 	}
 
-	if err != nil || resp.StatusCode != 200 {
+	if err != nil || resp == nil || resp.StatusCode != 200 {
 		if resp != nil {
 			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
 		} else {
