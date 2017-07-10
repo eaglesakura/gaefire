@@ -159,6 +159,8 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		defer resp.Body.Close()
 	}
 
+	log.Infof(ctx, "Check Resp[%v]", err)
+
 	if err != nil || resp == nil || resp.StatusCode != 200 {
 		if resp != nil {
 			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
@@ -168,6 +170,8 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		log.Errorf(ctx, "  - post body[%v]", string(buf))
 		return errors.New(http.StatusForbidden, "ApiKey check error")
 	}
+
+	log.Infof(ctx, "check Done")
 
 	// バッファを読み取る
 	buf, _ = ioutil.ReadAll(resp.Body)
