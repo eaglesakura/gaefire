@@ -96,15 +96,15 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 }
 
 func newHttpClient(ctx context.Context) *http.Client {
+	// タイムアウトを30秒に延長
+	deadline, _ := context.WithTimeout(ctx, 30*time.Second)
+
 	result := &http.Client{
 		Transport: &urlfetch.Transport{
-			Context: ctx,
+			Context: deadline,
 		},
 	}
-
-	// タイムアウトを30秒に延長
 	result.Timeout = 30 * time.Second
-
 	return result
 }
 
