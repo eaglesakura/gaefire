@@ -1,11 +1,10 @@
 package factory
 
 import (
+	"github.com/eaglesakura/gaefire"
 	gaefire_internal "github.com/eaglesakura/gaefire/internal"
 	"net/http"
-	"github.com/eaglesakura/gaefire"
 )
-
 
 /**
  * ハンドリング用のコンテキストを生成する

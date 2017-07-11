@@ -1,14 +1,14 @@
 package gaefire
 
 import (
-	"os"
-	"net/http"
-	"encoding/json"
-	"io/ioutil"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/urlfetch"
+	"io/ioutil"
+	"net/http"
+	"os"
 	"time"
 )
 
@@ -27,11 +27,11 @@ func UnmarshalJson(resp *http.Response, result interface{}) error {
 
 // 環境変数を取得する
 func GetEnv(key string, def string) string {
-	value, look := os.LookupEnv(key);
+	value, look := os.LookupEnv(key)
 	if !look {
-		return def;
+		return def
 	} else {
-		return value;
+		return value
 	}
 }
 

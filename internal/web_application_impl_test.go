@@ -1,12 +1,12 @@
 package gaefire
 
 import (
-	"testing"
-	"github.com/stretchr/testify/assert"
 	"encoding/json"
+	"github.com/eaglesakura/gaefire"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
-	"github.com/eaglesakura/gaefire"
+	"testing"
 )
 
 func newTestWebApp() gaefire.WebApplication {

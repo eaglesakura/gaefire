@@ -2,13 +2,13 @@ package gaefire
 
 import (
 	"crypto/rsa"
-	"sync"
-	"io/ioutil"
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
 	"net/url"
+	"sync"
 
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
@@ -44,18 +44,18 @@ func NewPublicKeystore(accountId string) *PublicKeystore {
 	url := url.URL{}
 	url.Path = "https://www.googleapis.com/robot/v1/metadata/x509/" + accountId
 	return &PublicKeystore{
-		readTarget:0,
-		accountId:accountId,
-		refreshUrl:url.EscapedPath(),
-		mutex : new(sync.Mutex),
-		keystore:[]*PublicKeyGroup{nil, nil},
+		readTarget: 0,
+		accountId:  accountId,
+		refreshUrl: url.EscapedPath(),
+		mutex:      new(sync.Mutex),
+		keystore:   []*PublicKeyGroup{nil, nil},
 	}
 }
 
 //
 // Find Public key
 //
-func (it *PublicKeystore)FindPublicKey(kid string) (*rsa.PublicKey, error) {
+func (it *PublicKeystore) FindPublicKey(kid string) (*rsa.PublicKey, error) {
 	read := it.keystore[it.readTarget]
 	if read != nil {
 		value := read.keys[kid]
@@ -70,7 +70,7 @@ func (it *PublicKeystore)FindPublicKey(kid string) (*rsa.PublicKey, error) {
 //
 // Refresh Keystore
 //
-func (it *PublicKeystore)Refresh(ctx context.Context) error {
+func (it *PublicKeystore) Refresh(ctx context.Context) error {
 
 	// download public keys
 	resp, err := newHttpClient(ctx).Get(it.refreshUrl)
@@ -80,23 +80,23 @@ func (it *PublicKeystore)Refresh(ctx context.Context) error {
 
 	if err != nil {
 		log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)\n", err.Error(), it.refreshUrl)
-		return err;
+		return err
 	}
 
 	writeData := &PublicKeyGroup{
-		keys:map[string]*PublicKey{},
+		keys: map[string]*PublicKey{},
 	}
 
 	// pull data & parse public key
 	{
-		var googlePublicKey  interface{};
+		var googlePublicKey interface{}
 		buf, ioEror := ioutil.ReadAll(resp.Body)
 		if ioEror != nil {
 			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioEror.Error(), it.refreshUrl)
 			return err
 		}
 
-		ioEror = json.Unmarshal(buf, &googlePublicKey);
+		ioEror = json.Unmarshal(buf, &googlePublicKey)
 		if ioEror != nil {
 			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioEror.Error(), it.refreshUrl)
 			return err
@@ -112,8 +112,8 @@ func (it *PublicKeystore)Refresh(ctx context.Context) error {
 			}
 
 			writeData.keys[key] = &PublicKey{
-				id:key,
-				publicKey:parsedKey,
+				id:        key,
+				publicKey: parsedKey,
 			}
 		}
 	}

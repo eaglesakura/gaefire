@@ -1,9 +1,9 @@
 package gaefire
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"fmt"
 	"errors"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
 )
 
@@ -11,7 +11,7 @@ type VerifiedJsonWebTokenImpl struct {
 	token *jwt.Token
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetUserId() (string, error) {
+func (it *VerifiedJsonWebTokenImpl) GetUserId() (string, error) {
 	result, err := it.GetClaim("user_id")
 	if err != nil {
 		return "", err
@@ -19,6 +19,7 @@ func (it *VerifiedJsonWebTokenImpl)GetUserId() (string, error) {
 		return fmt.Sprintf("%v", result), nil
 	}
 }
+
 /**
  * Firebaseユーザーを取得する
  */
@@ -32,7 +33,7 @@ func (it *VerifiedJsonWebTokenImpl) GetUser(result *gaefire.FirebaseUser) error 
 	return nil
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetAudience() (string, error) {
+func (it *VerifiedJsonWebTokenImpl) GetAudience() (string, error) {
 	result, err := it.GetClaim("aud")
 	if err != nil {
 		return "", err
@@ -41,7 +42,7 @@ func (it *VerifiedJsonWebTokenImpl)GetAudience() (string, error) {
 	}
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetClaim(key string) (interface{}, error) {
+func (it *VerifiedJsonWebTokenImpl) GetClaim(key string) (interface{}, error) {
 	if result, ok := it.token.Claims.(jwt.MapClaims)[key]; !ok {
 		return nil, errors.New(fmt.Sprintf("NotFound[%v]", key))
 	} else {
@@ -49,7 +50,7 @@ func (it *VerifiedJsonWebTokenImpl)GetClaim(key string) (interface{}, error) {
 	}
 }
 
-func (it *VerifiedJsonWebTokenImpl)GetHeader(key string) (interface{}, error) {
+func (it *VerifiedJsonWebTokenImpl) GetHeader(key string) (interface{}, error) {
 	if result, ok := it.token.Header[key]; !ok {
 		return nil, errors.New(fmt.Sprintf("NotFound[%v]", key))
 	} else {

@@ -1,12 +1,12 @@
 package gaefire
 
 import (
-	"golang.org/x/net/context"
-	"strings"
-	"github.com/dgrijalva/jwt-go"
 	"errors"
-	"google.golang.org/appengine/log"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/log"
+	"strings"
 )
 
 type JsonWebTokenVerifierImpl struct {
@@ -28,11 +28,11 @@ func newTokenError(raw error) (it *VerifyError) {
 
 	return &VerifyError{
 		internalError: internal,
-		rawError:raw,
+		rawError:      raw,
 	}
 }
 
-func (it *VerifyError)Error() string {
+func (it *VerifyError) Error() string {
 	if it.internalError != nil {
 		return it.internalError.Error()
 	} else {
@@ -43,7 +43,7 @@ func (it *VerifyError)Error() string {
 /**
  * "有効期限をチェックしない
  */
-func (it *JsonWebTokenVerifierImpl)SkipExpireTime() gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierImpl) SkipExpireTime() gaefire.JsonWebTokenVerifier {
 	it.skipExpireCheck = true
 	return it
 }
@@ -52,7 +52,7 @@ func (it *JsonWebTokenVerifierImpl)SkipExpireTime() gaefire.JsonWebTokenVerifier
  * 許可対象のAudienceを追加する
  * デフォルトではFirebase Service AccountのIDが登録される。
  */
-func (it *JsonWebTokenVerifierImpl)AddTrustedAudience(aud string) gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierImpl) AddTrustedAudience(aud string) gaefire.JsonWebTokenVerifier {
 	if it.trustedAud == nil {
 		it.trustedAud = []string{aud}
 	} else {
@@ -66,7 +66,7 @@ func (it *JsonWebTokenVerifierImpl)AddTrustedAudience(aud string) gaefire.JsonWe
  *
  * 他のプロジェクトに対して発行されたJWTを許可してしまうので、これを使用する場合は十分にセキュリティに注意を払う
  */
-func (it *JsonWebTokenVerifierImpl)SkipProjectId() gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierImpl) SkipProjectId() gaefire.JsonWebTokenVerifier {
 	it.skipProjectIdCheck = true
 	return it
 }
@@ -74,7 +74,7 @@ func (it *JsonWebTokenVerifierImpl)SkipProjectId() gaefire.JsonWebTokenVerifier 
 /**
  * 全てのオプションに対し、有効であることが確認できればtrue
  */
-func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error) {
+func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error) {
 	// parse & verify
 	rawToken, err := jwt.Parse(it.token, func(token *jwt.Token) (interface{}, error) {
 		kid := token.Header["kid"].(string)
@@ -137,7 +137,7 @@ func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error)
 	}
 
 	result := &VerifiedJsonWebTokenImpl{
-		token:rawToken,
+		token: rawToken,
 	}
 
 	// Token check
@@ -153,7 +153,6 @@ func (it *JsonWebTokenVerifierImpl)Valid() (gaefire.VerifiedJsonWebToken, error)
 				}
 			}
 		}
-
 
 		// 信頼できるIDが登録されていなかった
 		if !trusted {

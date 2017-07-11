@@ -1,8 +1,8 @@
 package gaefire
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
 )
 
@@ -11,9 +11,9 @@ import (
  */
 type TokenSourceModel struct {
 	jwt.StandardClaims
-	Uid    string`json:"uid,omitempty"`
-	Scope  string`json:"scope,omitempty"`
-	Claims map[string]string`json:"claims,omitempty"`
+	Uid    string            `json:"uid,omitempty"`
+	Scope  string            `json:"scope,omitempty"`
+	Claims map[string]string `json:"claims,omitempty"`
 }
 
 /**
@@ -23,13 +23,13 @@ type JsonWebTokenGeneratorImpl struct {
 	service   gaefire.ServiceAccount
 	source    TokenSourceModel
 	headers   map[string]string
-	lastError error;
+	lastError error
 }
 
 /**
  * creamを登録する
  */
-func (it *JsonWebTokenGeneratorImpl)AddClaim(key string, value interface{}) gaefire.JsonWebTokenGenerator {
+func (it *JsonWebTokenGeneratorImpl) AddClaim(key string, value interface{}) gaefire.JsonWebTokenGenerator {
 	if it.lastError == nil {
 		it.source.Claims[key] = fmt.Sprintf("%v", value)
 	}
@@ -41,7 +41,7 @@ func (it *JsonWebTokenGeneratorImpl)AddClaim(key string, value interface{}) gaef
  *
  * ex) AddClaim("kid", "your.private.key.id");
  */
-func (it *JsonWebTokenGeneratorImpl)AddHeader(key string, value interface{}) gaefire.JsonWebTokenGenerator {
+func (it *JsonWebTokenGeneratorImpl) AddHeader(key string, value interface{}) gaefire.JsonWebTokenGenerator {
 	if it.lastError != nil {
 		return it
 	}
@@ -55,7 +55,7 @@ func (it *JsonWebTokenGeneratorImpl)AddHeader(key string, value interface{}) gae
  *
  * `base64(header).base64(token).base64(sign)`
  */
-func (it *JsonWebTokenGeneratorImpl)Generate() (string, error) {
+func (it *JsonWebTokenGeneratorImpl) Generate() (string, error) {
 	if it.lastError != nil {
 		return "", it.lastError
 	}
@@ -64,7 +64,7 @@ func (it *JsonWebTokenGeneratorImpl)Generate() (string, error) {
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodRS256, it.source)
 
 	for key, value := range it.headers {
-		jwtToken.Header[key] = value;
+		jwtToken.Header[key] = value
 	}
 
 	// Gen JWT

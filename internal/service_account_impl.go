@@ -2,19 +2,20 @@ package gaefire
 
 import (
 	"crypto/rsa"
-	"time"
-	"fmt"
-	"errors"
 	"encoding/json"
-	"google.golang.org/appengine/log"
+	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/net/context"
 	"github.com/eaglesakura/gaefire"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/log"
+	"time"
 )
 
 const (
 	GooglePublicKeystoreAccount = "securetoken@system.gserviceaccount.com"
 )
+
 /**
  * service-account.jsonからロードしたサービスアカウント情報を定義する
  */
@@ -32,17 +33,17 @@ type FirebaseServiceAccountImpl struct {
 	/**
 	 * JSONをデコードしたそのままのデータ
 	 */
-	rawServiceAccount  ServiceAccountModel
+	rawServiceAccount ServiceAccountModel
 
 	/**
 	 * サービスアカウントの秘密鍵
 	 */
-	privateKey         *rsa.PrivateKey
+	privateKey *rsa.PrivateKey
 
 	/**
 	 * Google公開鍵キャッシュ
 	 */
-	googlePublicKeys   *PublicKeystore
+	googlePublicKeys *PublicKeystore
 
 	/**
 	 * Firebase公開鍵キャッシュ
@@ -55,9 +56,7 @@ func NewServiceAccount(jsonBuf []byte) gaefire.ServiceAccount {
 		panic(errors.New("NotFound"))
 	}
 
-	result := &FirebaseServiceAccountImpl{
-
-	}
+	result := &FirebaseServiceAccountImpl{}
 
 	if json.Unmarshal(jsonBuf, &result.rawServiceAccount) != nil {
 		panic(errors.New("Json parse failed"))
@@ -85,28 +84,28 @@ func NewServiceAccount(jsonBuf []byte) gaefire.ServiceAccount {
 /**
  * GCP Project IDを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetProjectId() string {
+func (it *FirebaseServiceAccountImpl) GetProjectId() string {
 	return it.rawServiceAccount.ProjectId
 }
 
 /**
  * Service Accountのメールアドレスを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetClientEmail() string {
+func (it *FirebaseServiceAccountImpl) GetClientEmail() string {
 	return it.rawServiceAccount.ClientEmail
 }
 
 /**
  * クライアント識別IDを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetClientId() string {
+func (it *FirebaseServiceAccountImpl) GetClientId() string {
 	return it.rawServiceAccount.ClientId
 }
 
 /**
  * 署名のためのPrivate Keyを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetPrivateKey() *rsa.PrivateKey {
+func (it *FirebaseServiceAccountImpl) GetPrivateKey() *rsa.PrivateKey {
 	return it.privateKey
 }
 
@@ -114,7 +113,7 @@ func (it *FirebaseServiceAccountImpl)GetPrivateKey() *rsa.PrivateKey {
  * 署名用のKeyIDを取得する
  * これは公開鍵チェックの際 "kid"として利用できる
  */
-func (it *FirebaseServiceAccountImpl)GetPrivateKeyId() string {
+func (it *FirebaseServiceAccountImpl) GetPrivateKeyId() string {
 	return it.rawServiceAccount.PrivateKeyId
 }
 
@@ -123,7 +122,7 @@ func (it *FirebaseServiceAccountImpl)GetPrivateKeyId() string {
  *
  * デフォルトではServiceAccountsの公開鍵、もしくはGoogleの公開鍵を検索する
  */
-func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid string) (*rsa.PublicKey, error) {
+func (it *FirebaseServiceAccountImpl) FindPublicKey(ctx context.Context, kid string) (*rsa.PublicKey, error) {
 
 	// Google公開鍵を探す
 	if key, err := it.googlePublicKeys.FindPublicKey(kid); err == nil {
@@ -143,7 +142,6 @@ func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid stri
 		return key, nil
 	}
 
-
 	// Firebase公開鍵をリフレッシュして再探索
 	if err := it.firebasePublicKeys.Refresh(ctx); err != nil {
 		return nil, err
@@ -161,32 +159,32 @@ func (it *FirebaseServiceAccountImpl)FindPublicKey(ctx context.Context, kid stri
  *
  * Firebase用に生成する場合、userUniqueIdは[1-36文字の英数]である必要がある。
  */
-func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenGenerator(userUniqueId string) gaefire.JsonWebTokenGenerator {
+func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenGenerator(userUniqueId string) gaefire.JsonWebTokenGenerator {
 	return &JsonWebTokenGeneratorImpl{
-		service:it,
-		source:TokenSourceModel{
-			StandardClaims:jwt.StandardClaims{
+		service: it,
+		source: TokenSourceModel{
+			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Unix() + 3600,
-				IssuedAt:time.Now().Unix(),
-				Audience:"https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
-				Issuer:it.GetClientEmail(),
-				Subject:it.GetClientEmail(),
+				IssuedAt:  time.Now().Unix(),
+				Audience:  "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
+				Issuer:    it.GetClientEmail(),
+				Subject:   it.GetClientEmail(),
 			},
-			Uid:userUniqueId,
-			Claims:map[string]string{},
+			Uid:    userUniqueId,
+			Claims: map[string]string{},
 		},
-		headers:map[string]string{},
+		headers: map[string]string{},
 	}
 }
 
 /**
  * Json Web TokenのVerifyオブジェクトを生成する
  */
-func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
+func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
 	return &JsonWebTokenVerifierImpl{
-		service:it,
-		ctx:ctx,
-		token:jwt,
+		service: it,
+		ctx:     ctx,
+		token:   jwt,
 	}
 }
 
@@ -194,7 +192,7 @@ func (it *FirebaseServiceAccountImpl)NewFirebaseAuthTokenVerifier(ctx context.Co
  * Json Web TokenのVerifyオブジェクトを生成する
  * Google Play Service:Authによって認証されたトークンはGoogle経由でVerifyを行なうほうが効率的
  */
-func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
+func (it *FirebaseServiceAccountImpl) NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
 	client := newHttpClient(ctx)
 	resp, err := client.Head("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
 	defer resp.Body.Close()
@@ -206,22 +204,21 @@ func (it *FirebaseServiceAccountImpl)NewGoogleAuthTokenVerifier(ctx context.Cont
 
 	if resp.StatusCode != 200 {
 		// 少なくともGoogleが発行したトークンでは無いので、無効である
-		return &JsonWebTokenVerifierStubImpl{
-		}
+		return &JsonWebTokenVerifierStubImpl{}
 	}
 
 	return &JsonWebTokenVerifierImpl{
-		service:it,
-		ctx:ctx,
-		token:jwt,
+		service: it,
+		ctx:     ctx,
+		token:   jwt,
 	}
 }
 
 /**
  * Service Accountとして認証するためのOAuth2トークンを取得する
  */
-func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
-	token := &OAuth2RefreshRequest{ctx:ctx, serviceAccount:it }
+func (it *FirebaseServiceAccountImpl) GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
+	token := &OAuth2RefreshRequest{ctx: ctx, serviceAccount: it}
 	token.AddScope(scope)
 	for _, value := range addScopes {
 		token.AddScope(value)
@@ -233,8 +230,8 @@ func (it *FirebaseServiceAccountImpl)GetServiceAccountToken(ctx context.Context,
  * Service Accountとして認証するためのOAuth2トークンを生成する
  * この生成結果はキャッシュされず、必ず新しいものとなる
  */
-func (it *FirebaseServiceAccountImpl)NewServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
-	token := &OAuth2RefreshRequest{ctx:ctx, serviceAccount:it }
+func (it *FirebaseServiceAccountImpl) NewServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
+	token := &OAuth2RefreshRequest{ctx: ctx, serviceAccount: it}
 	token.AddScope(scope)
 	for _, value := range addScopes {
 		token.AddScope(value)

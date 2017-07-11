@@ -1,23 +1,23 @@
 package gaefire
 
 import (
-	"strings"
-	"time"
-	"github.com/dgrijalva/jwt-go"
 	"errors"
-	"net/url"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/eaglesakura/gaefire"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
-	"github.com/eaglesakura/gaefire"
+	"net/url"
+	"strings"
+	"time"
 )
 
 var (
 	_OAUTH2_CACHE_DURATION = time.Duration(55 * time.Minute)
-	_OAUTH2_KIND_INFO = gaefire.KindInfo{Name:"oauth2-token-cache", Version:1}
+	_OAUTH2_KIND_INFO      = gaefire.KindInfo{Name: "oauth2-token-cache", Version: 1}
 )
 
 type OAuth2RefreshRequest struct {
-	ctx            context.Context
+	ctx context.Context
 
 	serviceAccount gaefire.ServiceAccount // for Service Account
 	scope          string                 // for Service Account
@@ -27,11 +27,10 @@ type OAuth2RefreshRequest struct {
 	refreshToken   string                 // for User Account
 }
 
-
 /**
  * アクセススコープを追加する
  */
-func (it *OAuth2RefreshRequest)AddScope(scope string) *OAuth2RefreshRequest {
+func (it *OAuth2RefreshRequest) AddScope(scope string) *OAuth2RefreshRequest {
 	if strings.Contains(it.scope, scope) {
 		return it
 	} else {
@@ -44,26 +43,25 @@ func (it *OAuth2RefreshRequest)AddScope(scope string) *OAuth2RefreshRequest {
 	return it
 }
 
-
 /**
  * サービスアカウントのOAuth2情報をリフレッシュする
  */
-func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, error) {
+func (it *OAuth2RefreshRequest) _newServiceOauth2Token() (gaefire.OAuth2Token, error) {
 	// https://developers.google.com/identity/protocols/OAuth2ServiceAccount
 	gen := &JsonWebTokenGeneratorImpl{
-		service:it.serviceAccount,
-		source:TokenSourceModel{
-			StandardClaims:jwt.StandardClaims{
+		service: it.serviceAccount,
+		source: TokenSourceModel{
+			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: time.Now().Unix() + 3600,
-				IssuedAt:time.Now().Unix(),
-				Audience:"https://www.googleapis.com/oauth2/v4/token",
-				Issuer:it.serviceAccount.GetClientEmail(),
-				Subject:it.serviceAccount.GetClientEmail(),
+				IssuedAt:  time.Now().Unix(),
+				Audience:  "https://www.googleapis.com/oauth2/v4/token",
+				Issuer:    it.serviceAccount.GetClientEmail(),
+				Subject:   it.serviceAccount.GetClientEmail(),
 			},
-			Scope:it.scope,
-			Claims:map[string]string{},
+			Scope:  it.scope,
+			Claims: map[string]string{},
 		},
-		headers:map[string]string{},
+		headers: map[string]string{},
 	}
 
 	jwtToken, _ := gen.Generate()
@@ -80,7 +78,7 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, er
 		defer resp.Body.Close()
 	} else {
 		log.Errorf(it.ctx, "Https error %v", err.Error())
-		return gaefire.OAuth2Token{}, err;
+		return gaefire.OAuth2Token{}, err
 	}
 
 	token := gaefire.OAuth2Token{}
@@ -100,7 +98,7 @@ func (it *OAuth2RefreshRequest)_newServiceOauth2Token() (gaefire.OAuth2Token, er
 /**
  * ユーザー用のOAuth2トークンを取得する
  */
-func (it *OAuth2RefreshRequest)_newUserOauth2Token() (gaefire.OAuth2Token, error) {
+func (it *OAuth2RefreshRequest) _newUserOauth2Token() (gaefire.OAuth2Token, error) {
 	token := gaefire.OAuth2Token{}
 
 	if len(it.refreshToken) > 0 {
@@ -124,7 +122,7 @@ func (it *OAuth2RefreshRequest)_newUserOauth2Token() (gaefire.OAuth2Token, error
 			defer resp.Body.Close()
 		} else {
 			log.Errorf(it.ctx, "Https error %v", err.Error())
-			return gaefire.OAuth2Token{}, err;
+			return gaefire.OAuth2Token{}, err
 		}
 
 		if err := UnmarshalJson(resp, &token); err != nil {
@@ -143,7 +141,7 @@ func (it *OAuth2RefreshRequest)_newUserOauth2Token() (gaefire.OAuth2Token, error
 /**
  * OAuth2トークンを取得する
  */
-func (it *OAuth2RefreshRequest)GetToken() (gaefire.OAuth2Token, error) {
+func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {
 
 	if len(it.accessCode) > 0 {
 		// 初回取得の場合はキャッシュは絶対に存在しない

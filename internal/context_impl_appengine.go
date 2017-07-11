@@ -3,9 +3,9 @@
 package gaefire
 
 import (
-	"net/http"
-	"google.golang.org/appengine"
 	"github.com/eaglesakura/gaefire"
+	"google.golang.org/appengine"
+	"net/http"
 )
 
 /**
@@ -13,8 +13,8 @@ import (
  */
 func NewContext(request *http.Request) gaefire.Context {
 	result := &ContextImpl{
-		ctx:appengine.NewContext(request),
-	};
+		ctx: appengine.NewContext(request),
+	}
 
-	return result;
+	return result
 }

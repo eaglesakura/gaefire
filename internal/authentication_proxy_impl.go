@@ -1,25 +1,25 @@
 package gaefire
 
 import (
-	"github.com/eaglesakura/gaefire"
-	"net/http"
-	"github.com/eaglesakura/swagger-go-core/errors"
-	"fmt"
-	"golang.org/x/net/context"
-	"time"
-	"encoding/json"
 	"bytes"
-	"io/ioutil"
-	"strings"
-	"github.com/dgrijalva/jwt-go"
-	"google.golang.org/appengine"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/eaglesakura/gaefire"
+	"github.com/eaglesakura/swagger-go-core/errors"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
 )
 
 var (
 	// セキュリティ上許されないヘッダ
-	SecurityCheckHeaders []string = []string{gaefire.HttpXHeaderUserInfo }
+	SecurityCheckHeaders []string = []string{gaefire.HttpXHeaderUserInfo}
 )
 
 /**
@@ -35,12 +35,12 @@ type SwaggerJsonModel struct {
 		ApiKey *struct {
 			Name string `json:"name"`
 			In   string `json:"in"`
-		}`json:"api_key,omitempty"`
+		} `json:"api_key,omitempty"`
 		GoogleIdToken *struct {
-			Issuer    string `json:"x-google-issuer"`
+			Issuer    string   `json:"x-google-issuer"`
 			Audiences []string `json:"x-google-audiences"`
-		}`json:"google_id_token,omitempty"`
-	}`json:"securityDefinitions"`
+		} `json:"google_id_token,omitempty"`
+	} `json:"securityDefinitions"`
 }
 
 /**
@@ -52,7 +52,7 @@ type ServiceCheckModel struct {
 		OperationName string `json:"operationName"`
 		ConsumerId    string `json:"consumerId"`
 		StartTime     string `json:"startTime"`
-	}`json:"operation"`
+	} `json:"operation"`
 }
 
 type ServiceCheckResultModel struct {
@@ -61,7 +61,7 @@ type ServiceCheckResultModel struct {
 	CheckErrors *[]struct {
 		Code   string `json:"code"`
 		Detail string `json:"detail"`
-	}`json:"checkErrors,omitempty"`
+	} `json:"checkErrors,omitempty"`
 }
 
 type AuthenticationProxyImpl struct {
@@ -96,35 +96,14 @@ func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefir
 	}
 
 	result.Option = option
-	if (len(option.EndpointsId) == 0) {
+	if len(option.EndpointsId) == 0 {
 		result.Option.EndpointsId = result.Swagger.Host
 	}
 
 	return result
 }
 
-/**
- * API Keyが入力されている場合、APIキーの妥当性をチェックする
- */
-func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
-	if it.Swagger.SecurityDefinitions.ApiKey == nil {
-		// API Keyはチェック対象ではない
-		return nil
-	}
-
-	var apiKey string
-	switch it.Swagger.SecurityDefinitions.ApiKey.In {
-	case "query":
-		apiKey = r.URL.Query().Get(it.Swagger.SecurityDefinitions.ApiKey.Name)
-	case "header":
-		apiKey = r.Header.Get(it.Swagger.SecurityDefinitions.ApiKey.Name)
-	}
-
-	if len(apiKey) == 0 {
-		// APIキーが指定されていない
-		return nil
-	}
-
+func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Context, apiKey string) error {
 	// Api Keyが使用されているので、妥当性をチェックする
 	model := ServiceCheckModel{}
 	model.Operation.OperationId = appengine.RequestID(ctx)
@@ -182,8 +161,42 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		return errors.New(http.StatusForbidden, (*validModel.CheckErrors)[0].Detail)
 	}
 
-	// API Keyは問題ない
+	// エラーなしでトークンチェックが行われた
+	return nil
+}
+
+/**
+ * API Keyが入力されている場合、APIキーの妥当性をチェックする
+ */
+func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
+	if it.Swagger.SecurityDefinitions.ApiKey == nil {
+		// API Keyはチェック対象ではない
+		return nil
+	}
+
+	var apiKey string
+	switch it.Swagger.SecurityDefinitions.ApiKey.In {
+	case "query":
+		apiKey = r.URL.Query().Get(it.Swagger.SecurityDefinitions.ApiKey.Name)
+	case "header":
+		apiKey = r.Header.Get(it.Swagger.SecurityDefinitions.ApiKey.Name)
+	}
+
+	if len(apiKey) == 0 {
+		// APIキーが指定されていない
+		return nil
+	}
+
+	// Service-Control APIでAPIKeyの妥当性を確認する
+	err := it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
+	if err != nil {
+		return err
+	}
+
+
+	// APIキーは妥当である
 	result.ApiKey = &apiKey
+
 	return nil
 }
 
@@ -218,8 +231,7 @@ func (it *AuthenticationProxyImpl) validOAuth2(ctx context.Context, authorizatio
 
 	result.OAuth2Token = &authorization
 	result.Audience = &token.Audience
-	result.User = &gaefire.UserInfo{
-	}
+	result.User = &gaefire.UserInfo{}
 
 	// ユーザー情報を書き出す
 	if len(token.Email) > 0 {
