@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
+	"sync/atomic"
 )
 
 type PublicKey struct {
@@ -29,7 +30,7 @@ type PublicKeyGroup struct {
  * 公開鍵は逐次変わるので、現状ではオンメモリにて管理される。
  */
 type PublicKeystore struct {
-	readTarget int
+	readTarget int32
 	accountId  string // GCP Service account email.
 	refreshUrl string // Publickey URL
 	mutex      *sync.Mutex
@@ -56,7 +57,7 @@ func NewPublicKeystore(accountId string) *PublicKeystore {
 // Find Public key
 //
 func (it *PublicKeystore) FindPublicKey(kid string) (*rsa.PublicKey, error) {
-	read := it.keystore[it.readTarget]
+	read := it.keystore[atomic.LoadInt32(&it.readTarget)]
 	if read != nil {
 		value := read.keys[kid]
 		if value != nil {
@@ -90,15 +91,15 @@ func (it *PublicKeystore) Refresh(ctx context.Context) error {
 	// pull data & parse public key
 	{
 		var googlePublicKey interface{}
-		buf, ioEror := ioutil.ReadAll(resp.Body)
-		if ioEror != nil {
-			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioEror.Error(), it.refreshUrl)
+		buf, ioError := ioutil.ReadAll(resp.Body)
+		if ioError != nil {
+			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl)
 			return err
 		}
 
-		ioEror = json.Unmarshal(buf, &googlePublicKey)
-		if ioEror != nil {
-			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioEror.Error(), it.refreshUrl)
+		ioError = json.Unmarshal(buf, &googlePublicKey)
+		if ioError != nil {
+			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl)
 			return err
 		}
 
@@ -122,10 +123,11 @@ func (it *PublicKeystore) Refresh(ctx context.Context) error {
 	it.mutex.Lock()
 	defer it.mutex.Unlock()
 
-	writeTarget := (it.readTarget + 1) % 2
-
+	writeTarget := (atomic.LoadInt32(&it.readTarget) + 1) % 2
+	log.Infof(ctx, "Before Read Index[%v] Write Index[%v]", it.readTarget, writeTarget)
 	it.keystore[writeTarget] = writeData
-	it.readTarget = writeTarget
+	atomic.StoreInt32(&it.readTarget, writeTarget)
+	log.Infof(ctx, " * Swap Read Index[%v]", it.readTarget)
 
 	return nil
 }
