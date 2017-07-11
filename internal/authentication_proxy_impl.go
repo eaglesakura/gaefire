@@ -22,6 +22,11 @@ var (
 	SecurityCheckHeaders []string = []string{gaefire.HttpXHeaderUserInfo}
 )
 
+var (
+	_APIKEY_CACHE_DURATION = time.Duration(1 * time.Minute)
+	_APIKEY_KIND_INFO      = gaefire.KindInfo{Name: "service-ctrl:api-key", Version: 1}
+)
+
 /**
  * Swaggerで定義した情報を元に、セキュリティ設定を行う。
  *
@@ -188,11 +193,22 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 	}
 
 	// Service-Control APIでAPIKeyの妥当性を確認する
-	err := it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
+	// 期限切れは1分
+	// `1,000,000 quota units per 100 seconds` なので、十分に使用可能である。
+	var loadedApiKey string
+	err := gaefire.NewMemcacheRequest(ctx).
+		SetKindInfo(_APIKEY_KIND_INFO).
+		SetId(apiKey).
+		SetExpireDate(time.Now().Add(_APIKEY_CACHE_DURATION)).
+		Load(&loadedApiKey,
+		func(ref interface{}) error {
+			log.Infof(ctx, "APIKey[%v] memcache not found", apiKey)
+			return it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
+		})
+
 	if err != nil {
 		return err
 	}
-
 
 	// APIキーは妥当である
 	result.ApiKey = &apiKey

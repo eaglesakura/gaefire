@@ -153,8 +153,7 @@ func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {
 		// キャッシュに突っ込む
 		gaefire.NewMemcacheRequest(it.ctx).
 			SetKindInfo(_OAUTH2_KIND_INFO).
-			SetExpireDate(time.Now().
-			Add(_OAUTH2_CACHE_DURATION)).
+			SetExpireDate(time.Now().Add(_OAUTH2_CACHE_DURATION)).
 			SetId("user-" + GenMD5(it.refreshToken)).
 			Save(&token)
 		return token, nil
@@ -169,8 +168,7 @@ func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {
 
 	req := gaefire.NewMemcacheRequest(it.ctx).
 		SetKindInfo(_OAUTH2_KIND_INFO).
-		SetExpireDate(time.Now().
-		Add(_OAUTH2_CACHE_DURATION)).
+		SetExpireDate(time.Now().Add(_OAUTH2_CACHE_DURATION)).
 		SetId(keyId)
 	token := gaefire.OAuth2Token{}
 
