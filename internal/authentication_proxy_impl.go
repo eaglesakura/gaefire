@@ -277,7 +277,8 @@ func (it *AuthenticationProxyImpl) validJsonWebToken(ctx context.Context, jwtStr
 		var firebaseJwt *string
 		var serviceJwt *string
 
-		if issuer == it.Swagger.SecurityDefinitions.GoogleIdToken.Issuer {
+		if it.Swagger.SecurityDefinitions.GoogleIdToken != nil &&
+			issuer == it.Swagger.SecurityDefinitions.GoogleIdToken.Issuer {
 			// Google IdTokenとして検証する
 			verifier = it.ServiceAccount.NewGoogleAuthTokenVerifier(ctx, jwtString)
 			for _, aud := range it.Swagger.SecurityDefinitions.GoogleIdToken.Audiences {

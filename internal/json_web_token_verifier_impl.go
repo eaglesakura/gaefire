@@ -77,7 +77,11 @@ func (it *JsonWebTokenVerifierImpl) SkipProjectId() gaefire.JsonWebTokenVerifier
 func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error) {
 	// parse & verify
 	rawToken, err := jwt.Parse(it.token, func(token *jwt.Token) (interface{}, error) {
-		kid := token.Header["kid"].(string)
+		kidValue := token.Header["kid"]
+		if kidValue == nil {
+			return nil, errors.New("NotFound kid")
+		}
+		kid := kidValue.(string)
 		if kid == "" {
 			return nil, errors.New("NotFound kid")
 		}
