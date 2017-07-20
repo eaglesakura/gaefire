@@ -2,10 +2,10 @@ package gaefire
 
 import (
 	"github.com/eaglesakura/gaefire"
-	"testing"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"testing"
 )
 
 func newTestServiceAccount() gaefire.ServiceAccount {

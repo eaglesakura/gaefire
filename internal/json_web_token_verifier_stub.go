@@ -8,11 +8,10 @@ import (
 type JsonWebTokenVerifierStubImpl struct {
 }
 
-
 /**
  * "有効期限をチェックしない
  */
-func (it *JsonWebTokenVerifierStubImpl)SkipExpireTime() gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierStubImpl) SkipExpireTime() gaefire.JsonWebTokenVerifier {
 	return it
 }
 
@@ -20,7 +19,7 @@ func (it *JsonWebTokenVerifierStubImpl)SkipExpireTime() gaefire.JsonWebTokenVeri
  * 許可対象のAudienceを追加する
  * デフォルトではFirebase Service AccountのIDが登録される。
  */
-func (it *JsonWebTokenVerifierStubImpl)AddTrustedAudience(aud string) gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierStubImpl) AddTrustedAudience(aud string) gaefire.JsonWebTokenVerifier {
 	return it
 }
 
@@ -29,14 +28,14 @@ func (it *JsonWebTokenVerifierStubImpl)AddTrustedAudience(aud string) gaefire.Js
  *
  * 他のプロジェクトに対して発行されたJWTを許可してしまうので、これを使用する場合は十分にセキュリティに注意を払う
  */
-func (it *JsonWebTokenVerifierStubImpl)SkipProjectId() gaefire.JsonWebTokenVerifier {
+func (it *JsonWebTokenVerifierStubImpl) SkipProjectId() gaefire.JsonWebTokenVerifier {
 	return it
 }
 
 /**
  * 全てのオプションに対し、有効であることが確認できればtrue
  */
-func (it *JsonWebTokenVerifierStubImpl)Valid() (gaefire.VerifiedJsonWebToken, error) {
+func (it *JsonWebTokenVerifierStubImpl) Valid() (gaefire.VerifiedJsonWebToken, error) {
 	return nil, errors.New("Error Verified")
 
 }

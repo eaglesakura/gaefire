@@ -1,10 +1,10 @@
 package gaefire
 
 import (
-	"golang.org/x/net/context"
 	"encoding/json"
 	"errors"
 	"github.com/eaglesakura/gaefire"
+	"golang.org/x/net/context"
 )
 
 type FirebaseWebApplicationImpl struct {
@@ -31,21 +31,21 @@ func NewWebApplication(jsonBuf []byte) gaefire.WebApplication {
 /**
  * GCP Project IDを取得する
  */
-func (it *FirebaseWebApplicationImpl)GetProjectId() string {
+func (it *FirebaseWebApplicationImpl) GetProjectId() string {
 	return it.rawWebApp.Web.ProjectId
 }
 
 /**
  * OAuth2 Client IDを取得する
  */
-func (it *FirebaseWebApplicationImpl)GetClientId() string {
+func (it *FirebaseWebApplicationImpl) GetClientId() string {
 	return it.rawWebApp.Web.ClientId
 }
 
 /**
  * OAuth2 Client Secretを取得する
  */
-func (it *FirebaseWebApplicationImpl)GetClientSecret() string {
+func (it *FirebaseWebApplicationImpl) GetClientSecret() string {
 	return it.rawWebApp.Web.ClientSecret
 }
 
@@ -55,11 +55,11 @@ func (it *FirebaseWebApplicationImpl)GetClientSecret() string {
  * 取得したOAuth2トークンはMemcacheに登録される。
  * ユーザーが明示的に権限を取り消している場合、エラーを返却する。
  */
-func (it *FirebaseWebApplicationImpl)NewUserAccountToken(ctx context.Context, accessCode string) (gaefire.OAuth2Token, error) {
+func (it *FirebaseWebApplicationImpl) NewUserAccountToken(ctx context.Context, accessCode string) (gaefire.OAuth2Token, error) {
 	tokenGen := &OAuth2RefreshRequest{
-		ctx:ctx,
-		webApplication:it,
-		accessCode:accessCode,
+		ctx:            ctx,
+		webApplication: it,
+		accessCode:     accessCode,
 	}
 
 	return tokenGen.GetToken()
@@ -72,11 +72,11 @@ func (it *FirebaseWebApplicationImpl)NewUserAccountToken(ctx context.Context, ac
  * キャッシュが存在しないかExpireされている場合、自動的にRefreshTokenを用いてリフレッシュした結果を返す。
  * ユーザーが明示的に権限を取り消している場合、エラーを返却する。
  */
-func (it *FirebaseWebApplicationImpl)GetUserAccountToken(ctx context.Context, refreshToken string) (gaefire.OAuth2Token, error) {
+func (it *FirebaseWebApplicationImpl) GetUserAccountToken(ctx context.Context, refreshToken string) (gaefire.OAuth2Token, error) {
 	tokenGen := &OAuth2RefreshRequest{
-		ctx:ctx,
-		webApplication:it,
-		refreshToken:refreshToken,
+		ctx:            ctx,
+		webApplication: it,
+		refreshToken:   refreshToken,
 	}
 	return tokenGen.GetToken()
 }

@@ -3,15 +3,15 @@
 package gaefire
 
 import (
-	"net/http"
 	"github.com/eaglesakura/gaefire"
 	"golang.org/x/net/context"
-	"google.golang.org/appengine/aetest"
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/aetest"
+	"net/http"
 )
 
 func testNewContext() (context.Context, func(), error) {
-	inst, err := aetest.NewInstance(&aetest.Options{StronglyConsistentDatastore:true})
+	inst, err := aetest.NewInstance(&aetest.Options{StronglyConsistentDatastore: true})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -32,12 +32,12 @@ func testNewContext() (context.Context, func(), error) {
 func NewContext(request *http.Request) gaefire.Context {
 	ctx, delFunc, err := testNewContext()
 	if err != nil {
-		panic(err);
+		panic(err)
 	}
 	result := &ContextImpl{
-		ctx:ctx,
-		closeFunc:delFunc,
-	};
+		ctx:       ctx,
+		closeFunc: delFunc,
+	}
 
-	return result;
+	return result
 }

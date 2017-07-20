@@ -1,9 +1,9 @@
 package gaefire
 
 import (
-	"testing"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func newTestSwaggerJson() SwaggerJsonModel {
