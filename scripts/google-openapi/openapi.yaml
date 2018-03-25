@@ -1,0 +1,12 @@
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "Enable ServiceControl."
+host: "GCP_PROJECT_ID.appspot.com"
+paths:
+  /dev/null:
+    get:
+      operationId: "/dev/null"
+      responses:
+          "200":
+            description: "/dev/null"

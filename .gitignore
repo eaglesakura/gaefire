@@ -32,3 +32,4 @@ out/
 /pkg
 /bin
 *.txt
+/openapi.yaml
