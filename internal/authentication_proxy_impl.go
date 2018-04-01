@@ -63,7 +63,7 @@ type ServiceCheckModel struct {
 type ServiceCheckResultModel struct {
 	OperationId     string `json:"operationId"`
 	ServiceConfigId string `json:"serviceConfigId"`
-	CheckErrors *[]struct {
+	CheckErrors     *[]struct {
 		Code   string `json:"code"`
 		Detail string `json:"detail"`
 	} `json:"checkErrors,omitempty"`
@@ -201,10 +201,10 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 		SetId(apiKey).
 		SetExpireDate(time.Now().Add(_APIKEY_CACHE_DURATION)).
 		Load(&loadedApiKey,
-		func(ref interface{}) error {
-			log.Infof(ctx, "APIKey[%v] memcache not found", apiKey)
-			return it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
-		})
+			func(ref interface{}) error {
+				log.Infof(ctx, "APIKey[%v] memcache not found", apiKey)
+				return it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
+			})
 
 	if err != nil {
 		return err
