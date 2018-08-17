@@ -25,7 +25,7 @@ func newOAuthTestData() UserOAuthTestData {
 	return result
 }
 
-/**
+/*
  * サービスアカウントの生成が行える
  */
 func TestNewFirebaseWebApp(t *testing.T) {
@@ -39,7 +39,7 @@ type UserOAuthTestData struct {
 	GoogleIdToken string `json:"googleIdToken,omitempty"`
 }
 
-/**
+/*
  * アクセスコードからOAuth2トークンを生成する
  */
 func TestOAuth2TokenNew(t *testing.T) {
@@ -74,7 +74,7 @@ func TestOAuth2TokenNew(t *testing.T) {
 	ioutil.WriteFile("private/user-token1-refresh.txt", []byte(token1.RefreshToken), os.ModePerm)
 }
 
-/**
+/*
  * リフレッシュトークンからOAuthTokenを再取得する
  */
 func TestOAuth2TokenRefresh(t *testing.T) {

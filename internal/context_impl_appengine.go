@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-/**
+/*
  * 通常のRequest用のContextを生成する
  */
 func NewContext(request *http.Request) gaefire.Context {

@@ -20,7 +20,7 @@ func (it *VerifiedJsonWebTokenImpl) GetUserId() (string, error) {
 	}
 }
 
-/**
+/*
  * Firebaseユーザーを取得する
  */
 func (it *VerifiedJsonWebTokenImpl) GetUser(result *gaefire.FirebaseUser) error {

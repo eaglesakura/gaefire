@@ -1,19 +1,15 @@
 package gaefire
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
-)
-
-const (
-	EnvWorkspace = "WORKSPACE"
 )
 
 func UnmarshalJson(resp *http.Response, result interface{}) error {
@@ -35,9 +31,9 @@ func GetEnv(key string, def string) string {
 	}
 }
 
-/**
- * 文字列をMD5に変換する
- */
+/*
+文字列をMD5に変換する
+*/
 func GenMD5(text string) string {
 	hash := md5.New()
 	hash.Write([]byte(text))

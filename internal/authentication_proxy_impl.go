@@ -2,13 +2,13 @@ package gaefire
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
 	"github.com/eaglesakura/swagger-go-core/errors"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 	"io/ioutil"
@@ -27,7 +27,7 @@ var (
 	_APIKEY_KIND_INFO      = gaefire.KindInfo{Name: "service-ctrl:api-key", Version: 1}
 )
 
-/**
+/*
  * Swaggerで定義した情報を元に、セキュリティ設定を行う。
  *
  * https://servicecontrol.googleapis.com/v1/services/{ENDPOINTS_SERVICE_NAME}:check
@@ -48,7 +48,7 @@ type SwaggerJsonModel struct {
 	} `json:"securityDefinitions"`
 }
 
-/**
+/*
  * https://servicecontrol.googleapis.com/v1/services/{host}:check にてバリデーションを行う
  */
 type ServiceCheckModel struct {
@@ -70,23 +70,23 @@ type ServiceCheckResultModel struct {
 }
 
 type AuthenticationProxyImpl struct {
-	/**
+	/*
 	 * 処理対象のサービスアカウント情報
 	 */
 	ServiceAccount gaefire.ServiceAccount
 
-	/**
+	/*
 	 * 認証オプション
 	 */
 	Option gaefire.AuthenticationProxyOption
 
-	/**
+	/*
 	 * セキュリティチェックソースとなるSwagger情報
 	 */
 	Swagger SwaggerJsonModel
 }
 
-/**
+/*
  * 認証サポート用のProxyを生成する。
  * 認証情報はswagger.jsonを元にパースされる。
  * パースに失敗した場合はnilが返却される
@@ -170,7 +170,7 @@ func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Conte
 	return nil
 }
 
-/**
+/*
  * API Keyが入力されている場合、APIキーの妥当性をチェックする
  */
 func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
@@ -327,7 +327,7 @@ func (it *AuthenticationProxyImpl) validJsonWebToken(ctx context.Context, jwtStr
 	return nil
 }
 
-/**
+/*
  * 認証情報をチェックする
  */
 func (it *AuthenticationProxyImpl) validAuthentication(ctx context.Context, r *http.Request, result *gaefire.AuthenticationInfo) error {
@@ -352,7 +352,7 @@ func (it *AuthenticationProxyImpl) validAuthentication(ctx context.Context, r *h
 	}
 }
 
-/**
+/*
  * ユーザー認証を行い、必要に応じてhttpリクエストを改変する。
  */
 func (it *AuthenticationProxyImpl) Verify(ctx context.Context, r *http.Request) (*gaefire.AuthenticationInfo, error) {

@@ -1,10 +1,10 @@
 package gaefire
 
 import (
+	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 	"net/url"
 	"strings"
@@ -27,7 +27,7 @@ type OAuth2RefreshRequest struct {
 	refreshToken   string                 // for User Account
 }
 
-/**
+/*
  * アクセススコープを追加する
  */
 func (it *OAuth2RefreshRequest) AddScope(scope string) *OAuth2RefreshRequest {
@@ -43,7 +43,7 @@ func (it *OAuth2RefreshRequest) AddScope(scope string) *OAuth2RefreshRequest {
 	return it
 }
 
-/**
+/*
  * サービスアカウントのOAuth2情報をリフレッシュする
  */
 func (it *OAuth2RefreshRequest) _newServiceOauth2Token() (gaefire.OAuth2Token, error) {
@@ -95,7 +95,7 @@ func (it *OAuth2RefreshRequest) _newServiceOauth2Token() (gaefire.OAuth2Token, e
 	return token, nil
 }
 
-/**
+/*
  * ユーザー用のOAuth2トークンを取得する
  */
 func (it *OAuth2RefreshRequest) _newUserOauth2Token() (gaefire.OAuth2Token, error) {
@@ -138,7 +138,7 @@ func (it *OAuth2RefreshRequest) _newUserOauth2Token() (gaefire.OAuth2Token, erro
 	return token, nil
 }
 
-/**
+/*
  * OAuth2トークンを取得する
  */
 func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {

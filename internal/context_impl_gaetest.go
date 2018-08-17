@@ -3,8 +3,8 @@
 package gaefire
 
 import (
+	"context"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/aetest"
 	"net/http"
@@ -26,7 +26,7 @@ func testNewContext() (context.Context, func(), error) {
 	}, nil
 }
 
-/**
+/*
  * UnitTest用のContextを生成する
  */
 func NewContext(request *http.Request) gaefire.Context {

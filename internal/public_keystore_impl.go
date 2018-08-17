@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"sync"
 
-	"golang.org/x/net/context"
+	"context"
 	"google.golang.org/appengine/log"
 	"sync/atomic"
 )
@@ -24,7 +24,7 @@ type PublicKeyGroup struct {
 	keys map[string]*PublicKey // PublicKeys
 }
 
-/**
+/*
  * 公開鍵を管理する。
  *
  * 公開鍵は逐次変わるので、現状ではオンメモリにて管理される。

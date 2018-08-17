@@ -24,7 +24,7 @@ func newTestSwaggerJsonBinary() []byte {
 	}
 }
 
-/**
+/*
  * サービスアカウントの生成が行える
  */
 func TestNewFirebaseServiceAccount(t *testing.T) {
@@ -32,7 +32,7 @@ func TestNewFirebaseServiceAccount(t *testing.T) {
 	assert.NotNil(t, account)
 }
 
-/**
+/*
  * OAuth2トークンが生成される
  */
 func TestServiceAccountAuthGen(t *testing.T) {
@@ -57,7 +57,7 @@ func TestServiceAccountAuthGen(t *testing.T) {
 	ioutil.WriteFile("private/service-token0.txt", []byte(token1.AccessToken), os.ModePerm)
 }
 
-/**
+/*
  * OAuth2トークンがキャッシュされる
  */
 func TestServiceAccountAuthCache(t *testing.T) {
@@ -80,7 +80,7 @@ func TestServiceAccountAuthCache(t *testing.T) {
 	assert.Equal(t, token1.AccessToken, token2.AccessToken)
 }
 
-/**
+/*
  * 認証用JWTが生成できる
  */
 func TestServiceAccountJwtGen(t *testing.T) {
@@ -101,7 +101,7 @@ func TestServiceAccountJwtGen(t *testing.T) {
 	ioutil.WriteFile("private/firebase-auth-token.txt", []byte(jwt), os.ModePerm)
 }
 
-/**
+/*
  * GoogleIdTokenのValidateを行なう
  */
 func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
@@ -138,7 +138,7 @@ func TestServiceAccountGoogleIdTokenValid(t *testing.T) {
 	}
 }
 
-/**
+/*
  * ProxyServiceを生成できる
  */
 func TestAuthProxy_Create(t *testing.T) {

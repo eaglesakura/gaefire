@@ -1,9 +1,9 @@
 package gaefire
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
@@ -13,45 +13,45 @@ import (
 )
 
 type OAuth2Token struct {
-	/**
+	/*
 	 * mail
 	 */
 	Email string `json:"email,omitempty"`
 
-	/**
+	/*
 	 * Access scopes
 	 */
 	Scopes string `json:"scope,omitempty"`
 
-	/**
+	/*
 	 * OAuth2 Access Token
 	 */
 	AccessToken string `json:"access_token,omitempty"`
 
-	/**
+	/*
 	 * Token Type "Bearer"
 	 */
 	TokenType string `json:"token_type,omitempty"`
 
-	/**
+	/*
 	 * OAuth2 Refresh token
 	 */
 	RefreshToken string `json:"refresh_token,omitempty"`
 
-	/**
+	/*
 	 * OAuth2 aud
 	 */
 	Audience string `json:"aud,omitempty"`
 }
 
-/**
+/*
  * http requestに認証を行なう
  */
 func (it *OAuth2Token) Authorize(req *http.Request) {
 	req.Header.Set("Authorization", it.TokenType+" "+it.AccessToken)
 }
 
-/**
+/*
  * トークンが有効であればtrue
  * ただし、有効期限のチェックを行わない。
  */
@@ -108,7 +108,7 @@ func newHttpClient(ctx context.Context) *http.Client {
 	return result
 }
 
-/**
+/*
  * OAuth2トークンをリフレッシュする。
  *
  * ただし、it.RefreshTokenが含まれていない場合、リフレッシュは行えない。

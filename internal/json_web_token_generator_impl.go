@@ -6,7 +6,7 @@ import (
 	"github.com/eaglesakura/gaefire"
 )
 
-/**
+/*
  * Token生成用の構造体
  */
 type TokenSourceModel struct {
@@ -16,7 +16,7 @@ type TokenSourceModel struct {
 	Claims map[string]string `json:"claims,omitempty"`
 }
 
-/**
+/*
  * Json Web Tokenを生成するGenerator
  */
 type JsonWebTokenGeneratorImpl struct {
@@ -26,7 +26,7 @@ type JsonWebTokenGeneratorImpl struct {
 	lastError error
 }
 
-/**
+/*
  * creamを登録する
  */
 func (it *JsonWebTokenGeneratorImpl) AddClaim(key string, value interface{}) gaefire.JsonWebTokenGenerator {
@@ -36,7 +36,7 @@ func (it *JsonWebTokenGeneratorImpl) AddClaim(key string, value interface{}) gae
 	return it
 }
 
-/**
+/*
  * JWTのヘッダに情報を付与する
  *
  * ex) AddClaim("kid", "your.private.key.id");
@@ -50,7 +50,7 @@ func (it *JsonWebTokenGeneratorImpl) AddHeader(key string, value interface{}) ga
 	return it
 }
 
-/**
+/*
  * Json Web Tokenの仕様に従って署名された値を生成する。
  *
  * `base64(header).base64(token).base64(sign)`

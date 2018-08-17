@@ -1,13 +1,13 @@
 package gaefire
 
 import (
+	"context"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 	"time"
 )
@@ -16,7 +16,7 @@ const (
 	GooglePublicKeystoreAccount = "securetoken@system.gserviceaccount.com"
 )
 
-/**
+/*
  * service-account.jsonからロードしたサービスアカウント情報を定義する
  */
 type ServiceAccountModel struct {
@@ -30,22 +30,22 @@ type ServiceAccountModel struct {
 
 // impl FirebaseServiceAccount
 type FirebaseServiceAccountImpl struct {
-	/**
+	/*
 	 * JSONをデコードしたそのままのデータ
 	 */
 	rawServiceAccount ServiceAccountModel
 
-	/**
+	/*
 	 * サービスアカウントの秘密鍵
 	 */
 	privateKey *rsa.PrivateKey
 
-	/**
+	/*
 	 * Google公開鍵キャッシュ
 	 */
 	googlePublicKeys *PublicKeystore
 
-	/**
+	/*
 	 * Firebase公開鍵キャッシュ
 	 */
 	firebasePublicKeys *PublicKeystore
@@ -81,35 +81,35 @@ func NewServiceAccount(jsonBuf []byte) gaefire.ServiceAccount {
 	return result
 }
 
-/**
+/*
  * GCP Project IDを取得する
  */
 func (it *FirebaseServiceAccountImpl) GetProjectId() string {
 	return it.rawServiceAccount.ProjectId
 }
 
-/**
+/*
  * Service Accountのメールアドレスを取得する
  */
 func (it *FirebaseServiceAccountImpl) GetClientEmail() string {
 	return it.rawServiceAccount.ClientEmail
 }
 
-/**
+/*
  * クライアント識別IDを取得する
  */
 func (it *FirebaseServiceAccountImpl) GetClientId() string {
 	return it.rawServiceAccount.ClientId
 }
 
-/**
+/*
  * 署名のためのPrivate Keyを取得する
  */
 func (it *FirebaseServiceAccountImpl) GetPrivateKey() *rsa.PrivateKey {
 	return it.privateKey
 }
 
-/**
+/*
  * 署名用のKeyIDを取得する
  * これは公開鍵チェックの際 "kid"として利用できる
  */
@@ -117,7 +117,7 @@ func (it *FirebaseServiceAccountImpl) GetPrivateKeyId() string {
 	return it.rawServiceAccount.PrivateKeyId
 }
 
-/**
+/*
  * JWT署名検証のために公開鍵を検索する。
  *
  * デフォルトではServiceAccountsの公開鍵、もしくはGoogleの公開鍵を検索する
@@ -154,7 +154,7 @@ func (it *FirebaseServiceAccountImpl) FindPublicKey(ctx context.Context, kid str
 	return nil, errors.New(fmt.Sprintf("Not Found Keystore[%v]", kid))
 }
 
-/**
+/*
  * ユーザー名を指定し、JWTの生成を開始する
  *
  * Firebase用に生成する場合、userUniqueIdは[1-36文字の英数]である必要がある。
@@ -177,7 +177,7 @@ func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenGenerator(userUniqueId
 	}
 }
 
-/**
+/*
  * Json Web TokenのVerifyオブジェクトを生成する
  */
 func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
@@ -188,7 +188,7 @@ func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenVerifier(ctx context.C
 	}
 }
 
-/**
+/*
  * Json Web TokenのVerifyオブジェクトを生成する
  * Google Play Service:Authによって認証されたトークンはGoogle経由でVerifyを行なうほうが効率的
  */
@@ -214,7 +214,7 @@ func (it *FirebaseServiceAccountImpl) NewGoogleAuthTokenVerifier(ctx context.Con
 	}
 }
 
-/**
+/*
  * Service Accountとして認証するためのOAuth2トークンを取得する
  */
 func (it *FirebaseServiceAccountImpl) GetServiceAccountToken(ctx context.Context, scope string, addScopes ...string) (gaefire.OAuth2Token, error) {
@@ -226,7 +226,7 @@ func (it *FirebaseServiceAccountImpl) GetServiceAccountToken(ctx context.Context
 	return token.GetToken()
 }
 
-/**
+/*
  * Service Accountとして認証するためのOAuth2トークンを生成する
  * この生成結果はキャッシュされず、必ず新しいものとなる
  */

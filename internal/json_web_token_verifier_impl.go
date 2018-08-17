@@ -1,10 +1,10 @@
 package gaefire
 
 import (
+	"context"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 	"strings"
 )
@@ -40,7 +40,7 @@ func (it *VerifyError) Error() string {
 	}
 }
 
-/**
+/*
  * "有効期限をチェックしない
  */
 func (it *JsonWebTokenVerifierImpl) SkipExpireTime() gaefire.JsonWebTokenVerifier {
@@ -48,7 +48,7 @@ func (it *JsonWebTokenVerifierImpl) SkipExpireTime() gaefire.JsonWebTokenVerifie
 	return it
 }
 
-/**
+/*
  * 許可対象のAudienceを追加する
  * デフォルトではFirebase Service AccountのIDが登録される。
  */
@@ -61,7 +61,7 @@ func (it *JsonWebTokenVerifierImpl) AddTrustedAudience(aud string) gaefire.JsonW
 	return it
 }
 
-/**
+/*
  * "aud"チェックをスキップする
  *
  * 他のプロジェクトに対して発行されたJWTを許可してしまうので、これを使用する場合は十分にセキュリティに注意を払う
@@ -71,7 +71,7 @@ func (it *JsonWebTokenVerifierImpl) SkipProjectId() gaefire.JsonWebTokenVerifier
 	return it
 }
 
-/**
+/*
  * 全てのオプションに対し、有効であることが確認できればtrue
  */
 func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error) {

@@ -1,11 +1,11 @@
 package gaefire
 
 import (
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"golang.org/x/net/context"
 )
 
 /*
@@ -39,7 +39,7 @@ type ServiceAccount interface {
 	*/
 	GetPrivateKey() *rsa.PrivateKey
 
-	/**
+	/*
 	 * 署名用のKeyIDを取得する
 	 * これは公開鍵チェックの際 "kid"として利用できる
 	 */
@@ -57,7 +57,7 @@ type ServiceAccount interface {
 	*/
 	NewFirebaseAuthTokenGenerator(userUniqueId string) JsonWebTokenGenerator
 
-	/**
+	/*
 	 * Json Web TokenのVerifyオブジェクトを生成する
 	 */
 	NewFirebaseAuthTokenVerifier(ctx context.Context, jwt string) JsonWebTokenVerifier

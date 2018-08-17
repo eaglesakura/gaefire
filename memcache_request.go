@@ -1,24 +1,24 @@
 package gaefire
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/context"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/memcache"
 	"time"
 )
 
-/**
+/*
  * Memcache/Datastoreに保存するデータのKind情報を定義する
  */
 type KindInfo struct {
-	/**
+	/*
 	 * Kind名, Keyの一部に利用される
 	 */
 	Name string
 
-	/**
+	/*
 	 * バージョン番号, Keyの一部に利用される
 	 */
 	Version int
