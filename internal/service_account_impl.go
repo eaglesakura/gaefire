@@ -194,7 +194,7 @@ func (it *FirebaseServiceAccountImpl) NewFirebaseAuthTokenVerifier(ctx context.C
  */
 func (it *FirebaseServiceAccountImpl) NewGoogleAuthTokenVerifier(ctx context.Context, jwt string) gaefire.JsonWebTokenVerifier {
 	client := newHttpClient(ctx)
-	resp, err := client.Head("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + jwt)
 	defer resp.Body.Close()
 
 	if err != nil {
