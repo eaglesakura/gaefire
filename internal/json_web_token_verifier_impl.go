@@ -79,11 +79,15 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 	rawToken, err := jwt.Parse(it.token, func(token *jwt.Token) (interface{}, error) {
 		kidValue := token.Header["kid"]
 		if kidValue == nil {
-			return nil, errors.New("NotFound kid")
+			// use myself
+			return &it.service.GetPrivateKey().PublicKey, nil
+			//return nil, errors.New("NotFound kid")
 		}
 		kid := kidValue.(string)
 		if kid == "" {
-			return nil, errors.New("NotFound kid")
+			// use myself
+			return &it.service.GetPrivateKey().PublicKey, nil
+			//return nil, errors.New("NotFound kid")
 		}
 
 		publicKey, err := it.service.FindPublicKey(it.ctx, kid)
@@ -98,7 +102,7 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 	if rawToken == nil {
 		// Verify error
 		log.Errorf(it.ctx, "Token format error")
-		return nil, newTokenError(errors.New("Token format error."))
+		return nil, newTokenError(errors.New("token format error"))
 	}
 
 	if err != nil && strings.Contains(err.Error(), "crypto/rsa") {
@@ -161,7 +165,7 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 		// 信頼できるIDが登録されていなかった
 		if !trusted {
 			log.Errorf(it.ctx, "Token replace attack? token[%v] service[%v] ", projectId, it.service.GetProjectId())
-			return nil, newTokenError(errors.New("Token project id error."))
+			return nil, newTokenError(errors.New("project id error"))
 		}
 	}
 
