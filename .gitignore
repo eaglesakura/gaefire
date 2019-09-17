@@ -33,3 +33,4 @@ out/
 /bin
 *.txt
 /openapi.yaml
+go.sum
