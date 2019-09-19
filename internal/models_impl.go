@@ -7,5 +7,5 @@ type WebApplicationInfoModel struct {
 }
 
 type WebApplicationModel struct {
-	Web WebApplicationInfoModel `json:web`
+	Web WebApplicationInfoModel `json:"web"`
 }

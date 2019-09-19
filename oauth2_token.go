@@ -1,11 +1,10 @@
 package gaefire
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -66,19 +65,19 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 	}
 
 	if err != nil {
-		log.Errorf(ctx, "OAuth2 validate error[%s]", err.Error())
+		logError(fmt.Sprintf("OAuth2 validate error[%s]", err.Error()))
 		return false
 	}
 
 	if resp.StatusCode != 200 {
-		log.Errorf(ctx, "OAuth2 invalid_token")
+		logError("OAuth2 invalid_token")
 		return false
 	}
 
 	tempToken := OAuth2Token{}
 	buf, _ := ioutil.ReadAll(resp.Body)
 	if err := json.Unmarshal(buf, &tempToken); err != nil {
-		log.Errorf(ctx, "OAuth2 parse error[%s]", err.Error())
+		logError(fmt.Sprintf("OAuth2 parse error[%s]", err.Error()))
 		return false
 	}
 
@@ -97,14 +96,9 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 
 func newHttpClient(ctx context.Context) *http.Client {
 	// タイムアウトを30秒に延長
-	deadline, _ := context.WithTimeout(ctx, 30*time.Second)
-
 	result := &http.Client{
-		Transport: &urlfetch.Transport{
-			Context: deadline,
-		},
+		Timeout: 30 * time.Second,
 	}
-	result.Timeout = 30 * time.Second
 	return result
 }
 
@@ -129,19 +123,19 @@ func (it *OAuth2Token) Refresh(ctx context.Context, clientId string, clientSecre
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	} else {
-		log.Errorf(ctx, "Https error %v", err.Error())
+		logError(fmt.Sprintf("Https error %v", err))
 		return err
 	}
 
 	tempToken := OAuth2Token{}
 	buf, _ := ioutil.ReadAll(resp.Body)
 	if err := json.Unmarshal(buf, &tempToken); err != nil {
-		log.Errorf(ctx, "OAuth2 parse error[%s]", err.Error())
+		logError(fmt.Sprintf("OAuth2 parse error[%s]", err))
 		return err
 	}
 
 	if len(tempToken.AccessToken) == 0 {
-		return errors.New("Access token not found")
+		return errors.New("access token not found")
 	}
 
 	it.AccessToken = tempToken.AccessToken

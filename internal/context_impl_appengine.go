@@ -1,10 +1,8 @@
-// +build !gaetest
-
 package gaefire
 
 import (
+	"context"
 	"github.com/eaglesakura/gaefire"
-	"google.golang.org/appengine"
 	"net/http"
 )
 
@@ -13,7 +11,7 @@ import (
  */
 func NewContext(request *http.Request) gaefire.Context {
 	result := &ContextImpl{
-		ctx: appengine.NewContext(request),
+		ctx: context.Background(),
 	}
 
 	return result

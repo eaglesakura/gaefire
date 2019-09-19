@@ -1,11 +1,11 @@
 package gaefire
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
 	"strings"
 )
 
@@ -92,7 +92,7 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 
 		publicKey, err := it.service.FindPublicKey(it.ctx, kid)
 		if err != nil {
-			log.Errorf(it.ctx, "Not found public key")
+			logError("Not found public key")
 			return nil, err
 		} else {
 			return publicKey, nil
@@ -101,19 +101,19 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 
 	if rawToken == nil {
 		// Verify error
-		log.Errorf(it.ctx, "Token format error")
+		logError("Token format error")
 		return nil, newTokenError(errors.New("token format error"))
 	}
 
 	if err != nil && strings.Contains(err.Error(), "crypto/rsa") {
 		// Verify error
-		log.Errorf(it.ctx, "crypt/rsa error")
+		logError("crypt/rsa error")
 		return nil, newTokenError(err)
 	}
 
 	if rawToken.Claims != nil {
 		if err != nil {
-			log.Debugf(it.ctx, "Refresh Validate old[%v]", err.Error())
+			logDebug(fmt.Sprintf("Refresh Validate old[%v]", err.Error()))
 		}
 		err = rawToken.Claims.Valid()
 	}
@@ -123,24 +123,24 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 		internalError, _ := err.(*jwt.ValidationError)
 
 		if internalError != nil {
-			log.Debugf(it.ctx, "Start Errors. %v", internalError.Errors)
+			logDebug(fmt.Sprintf("Start Errors. %v", internalError.Errors))
 			if it.skipExpireCheck {
 				internalError.Errors &= ^(jwt.ValidationErrorExpired | jwt.ValidationErrorIssuedAt)
-				log.Debugf(it.ctx, "Skip Expire check")
+				logDebug("Skip Expire check")
 			}
 
 			// remove error?
 			if internalError.Errors == 0 {
 				err = nil
 			} else {
-				log.Debugf(it.ctx, "Updated Errors. %v", internalError.Errors)
+				logDebug(fmt.Sprintf("Updated Errors. %v", internalError.Errors))
 			}
 		}
 	}
 
 	// check error
 	if err != nil {
-		log.Errorf(it.ctx, "Validate error")
+		logError("Validate error")
 		return nil, newTokenError(err)
 	}
 
@@ -164,7 +164,7 @@ func (it *JsonWebTokenVerifierImpl) Valid() (gaefire.VerifiedJsonWebToken, error
 
 		// 信頼できるIDが登録されていなかった
 		if !trusted {
-			log.Errorf(it.ctx, "Token replace attack? token[%v] service[%v] ", projectId, it.service.GetProjectId())
+			logError(fmt.Sprintf("Token replace attack? token[%v] service[%v] ", projectId, it.service.GetProjectId()))
 			return nil, newTokenError(errors.New("project id error"))
 		}
 	}

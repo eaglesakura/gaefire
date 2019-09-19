@@ -1,19 +1,19 @@
 package gaefire
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
 	"net/url"
 	"strings"
 	"time"
 )
 
 var (
-	_OAUTH2_CACHE_DURATION = time.Duration(55 * time.Minute)
-	_OAUTH2_KIND_INFO      = gaefire.KindInfo{Name: "oauth2-token-cache", Version: 1}
+	oauth2CacheDuration = time.Duration(55 * time.Minute)
+	oauth2KindInfo      = gaefire.KindInfo{Name: "oauth2-token-cache", Version: 1}
 )
 
 type OAuth2RefreshRequest struct {
@@ -35,7 +35,7 @@ func (it *OAuth2RefreshRequest) AddScope(scope string) *OAuth2RefreshRequest {
 		return it
 	} else {
 		if len(it.scope) > 0 {
-			it.scope += (" " + scope)
+			it.scope += " " + scope
 		} else {
 			it.scope = scope
 		}
@@ -77,13 +77,13 @@ func (it *OAuth2RefreshRequest) _newServiceOauth2Token() (gaefire.OAuth2Token, e
 	if resp != nil && resp.Body != nil {
 		defer resp.Body.Close()
 	} else {
-		log.Errorf(it.ctx, "Https error %v", err.Error())
+		logError(fmt.Sprintf("Https error %v", err))
 		return gaefire.OAuth2Token{}, err
 	}
 
 	token := gaefire.OAuth2Token{}
 	if err := UnmarshalJson(resp, &token); err != nil {
-		log.Errorf(it.ctx, "jwt=%v", jwtToken)
+		logError(fmt.Sprintf("jwt=%v", jwtToken))
 		return gaefire.OAuth2Token{}, err
 	}
 
@@ -121,7 +121,7 @@ func (it *OAuth2RefreshRequest) _newUserOauth2Token() (gaefire.OAuth2Token, erro
 		if resp != nil && resp.Body != nil {
 			defer resp.Body.Close()
 		} else {
-			log.Errorf(it.ctx, "Https error %v", err.Error())
+			logError(fmt.Sprintf("Https error %v", err))
 			return gaefire.OAuth2Token{}, err
 		}
 
@@ -132,7 +132,7 @@ func (it *OAuth2RefreshRequest) _newUserOauth2Token() (gaefire.OAuth2Token, erro
 
 	if !token.Valid(it.ctx) {
 		// 何らかの原因でToken検証に失敗した
-		return gaefire.OAuth2Token{}, errors.New("OAuth2 token validate error.")
+		return gaefire.OAuth2Token{}, errors.New("OAuth2 token validate error")
 	}
 
 	return token, nil
@@ -151,9 +151,10 @@ func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {
 		}
 
 		// キャッシュに突っ込む
-		gaefire.NewMemcacheRequest(it.ctx).
-			SetKindInfo(_OAUTH2_KIND_INFO).
-			SetExpireDate(time.Now().Add(_OAUTH2_CACHE_DURATION)).
+		// エラーは無視する
+		_ = gaefire.NewMemcacheRequest(it.ctx).
+			SetKindInfo(oauth2KindInfo).
+			SetExpireDate(time.Now().Add(oauth2CacheDuration)).
 			SetId("user-" + GenMD5(it.refreshToken)).
 			Save(&token)
 		return token, nil
@@ -167,8 +168,8 @@ func (it *OAuth2RefreshRequest) GetToken() (gaefire.OAuth2Token, error) {
 	}
 
 	req := gaefire.NewMemcacheRequest(it.ctx).
-		SetKindInfo(_OAUTH2_KIND_INFO).
-		SetExpireDate(time.Now().Add(_OAUTH2_CACHE_DURATION)).
+		SetKindInfo(oauth2KindInfo).
+		SetExpireDate(time.Now().Add(oauth2CacheDuration)).
 		SetId(keyId)
 	token := gaefire.OAuth2Token{}
 

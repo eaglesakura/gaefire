@@ -1,11 +1,11 @@
 package gaefire
 
 import (
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"golang.org/x/net/context"
 )
 
 /*

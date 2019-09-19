@@ -10,8 +10,7 @@ import (
 	"net/url"
 	"sync"
 
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
+	"context"
 	"sync/atomic"
 )
 
@@ -80,7 +79,7 @@ func (it *PublicKeystore) Refresh(ctx context.Context) error {
 	}
 
 	if err != nil {
-		log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)\n", err.Error(), it.refreshUrl)
+		logError(fmt.Sprintf("CertRefresh failed err(%v) url(%v)\n", err.Error(), it.refreshUrl))
 		return err
 	}
 
@@ -93,22 +92,22 @@ func (it *PublicKeystore) Refresh(ctx context.Context) error {
 		var googlePublicKey interface{}
 		buf, ioError := ioutil.ReadAll(resp.Body)
 		if ioError != nil {
-			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl)
+			logError(fmt.Sprintf("CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl))
 			return err
 		}
 
 		ioError = json.Unmarshal(buf, &googlePublicKey)
 		if ioError != nil {
-			log.Errorf(ctx, "CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl)
+			logError(fmt.Sprintf("CertRefresh failed err(%v) url(%v)", ioError.Error(), it.refreshUrl))
 			return err
 		}
 
 		// to map
 		for key, value := range googlePublicKey.(map[string]interface{}) {
-			log.Debugf(ctx, "Pull key id[%v] value[%v...]", key, value.(string)[:10])
+			logDebug(fmt.Sprintf("Pull key id[%v] value[%v...]", key, value.(string)[:10]))
 			parsedKey, keyError := jwt.ParseRSAPublicKeyFromPEM([]byte(value.(string)))
 			if keyError != nil {
-				log.Errorf(ctx, "RSA Key failed err(%v) url(%v)", keyError.Error(), it.refreshUrl)
+				logError(fmt.Sprintf("RSA Key failed err(%v) url(%v)", keyError.Error(), it.refreshUrl))
 				return err
 			}
 
@@ -124,10 +123,10 @@ func (it *PublicKeystore) Refresh(ctx context.Context) error {
 	defer it.mutex.Unlock()
 
 	writeTarget := (atomic.LoadInt32(&it.readTarget) + 1) % 2
-	log.Infof(ctx, "Before Read Index[%v] Write Index[%v]", it.readTarget, writeTarget)
+	logInfo(fmt.Sprintf("Before Read Index[%v] Write Index[%v]", it.readTarget, writeTarget))
 	it.keystore[writeTarget] = writeData
 	atomic.StoreInt32(&it.readTarget, writeTarget)
-	log.Infof(ctx, " * Swap Read Index[%v]", it.readTarget)
+	logInfo(fmt.Sprintf(" * Swap Read Index[%v]", it.readTarget))
 
 	return nil
 }

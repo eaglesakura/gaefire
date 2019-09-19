@@ -1,10 +1,10 @@
 package gaefire
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
 )
 
 type FirebaseWebApplicationImpl struct {
@@ -21,7 +21,7 @@ func NewWebApplication(jsonBuf []byte) gaefire.WebApplication {
 	}
 
 	if len(result.rawWebApp.Web.ClientId) == 0 || len(result.rawWebApp.Web.ClientSecret) == 0 {
-		panic(errors.New("Client data not found."))
+		panic(errors.New("client data not found"))
 		return nil
 	}
 

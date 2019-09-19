@@ -1,8 +1,8 @@
 package gaefire
 
 import (
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
+	"context"
+	"fmt"
 )
 
 type ContextImpl struct {
@@ -27,22 +27,22 @@ func (it *ContextImpl) GetAppengineContext() context.Context {
 /**
  * エラーログ出力を行なう
  */
-func (it *ContextImpl) LogError(fmt string, args ...interface{}) {
-	log.Errorf(it.ctx, fmt, args...)
+func (it *ContextImpl) LogError(format string, args ...interface{}) {
+	logError(fmt.Sprintf(format, args...))
 }
 
 /**
  * デバッグログ出力を行なう
  */
-func (it *ContextImpl) LogDebug(fmt string, args ...interface{}) {
-	log.Debugf(it.ctx, fmt, args...)
+func (it *ContextImpl) LogDebug(format string, args ...interface{}) {
+	logDebug(fmt.Sprintf(format, args...))
 }
 
 /**
  * インフォログ出力を行なう
  */
-func (it *ContextImpl) LogInfo(fmt string, args ...interface{}) {
-	log.Infof(it.ctx, fmt, args...)
+func (it *ContextImpl) LogInfo(format string, args ...interface{}) {
+	logInfo(fmt.Sprintf(format, args...))
 }
 
 /**

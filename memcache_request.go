@@ -1,13 +1,14 @@
 package gaefire
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/memcache"
+	"github.com/patrickmn/go-cache"
 	"time"
 )
+
+var memcache = cache.New(60*time.Minute, 10*time.Minute)
 
 /**
  * Memcache/Datastoreに保存するデータのKind情報を定義する
@@ -34,7 +35,7 @@ type MemcacheLoadRequest struct {
 func NewMemcacheRequest(ctx context.Context) *MemcacheLoadRequest {
 	return &MemcacheLoadRequest{
 		ctx:  ctx,
-		kind: KindInfo{Name: "Default", Version: 1},
+		kind: KindInfo{Name: "Default", Version: 2},
 	}
 }
 
@@ -61,40 +62,27 @@ func (it *MemcacheLoadRequest) Save(value interface{}) error {
 	key := it.getKey()
 	buf, err := json.Marshal(value)
 	if err != nil {
-		log.Debugf(it.ctx, "Marshal error[%v]", key)
+		logDebug(fmt.Sprintf("Marshal error[%v]", key))
 		return &DatastoreError{message: "Parse failed", errors: []error{err}}
 	}
 
-	item := &memcache.Item{
-		Key:   key,
-		Value: buf,
-	}
-
-	if it.expireDate != nil {
-		item.Expiration = it.expireDate.Sub(time.Now())
-	}
-
-	return memcache.Set(it.ctx, item)
+	memcache.Set(key, buf, it.expireDate.Sub(time.Now()))
+	return nil
 }
 
 func (it *MemcacheLoadRequest) Load(result interface{}, createFunc func(result interface{}) error) error {
 	key := it.getKey()
-	item, err := memcache.Get(it.ctx, key)
-
-	if err == nil {
-		// デコードを行わせる
-		return json.Unmarshal(item.Value, result)
-	} else if err != nil && createFunc != nil {
-		// memcahceに無いので、データを生成させる
-		log.Debugf(it.ctx, "Memcache not found[%v]", key)
+	if buf, found := memcache.Get(key); found {
+		// found memcache.
+		return json.Unmarshal(buf.([]byte), result)
+	} else {
+		// not found memcache.
+		logDebug(fmt.Sprintf("Memcache not found[%v]", key))
 		createErr := createFunc(result)
 		if createErr == nil {
-			it.Save(result)
-			return nil
+			return it.Save(result)
 		} else {
 			return createErr
 		}
 	}
-
-	return err
 }

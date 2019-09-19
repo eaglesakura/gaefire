@@ -2,15 +2,13 @@ package gaefire
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
 	"github.com/eaglesakura/swagger-go-core/errors"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -23,8 +21,8 @@ var (
 )
 
 var (
-	_APIKEY_CACHE_DURATION = time.Duration(1 * time.Minute)
-	_APIKEY_KIND_INFO      = gaefire.KindInfo{Name: "service-ctrl:api-key", Version: 1}
+	apiKeyCacheDuration = time.Duration(30 * time.Minute)
+	apiKeyKindInfo      = gaefire.KindInfo{Name: "service-ctrl:api-key", Version: 1}
 )
 
 /**
@@ -111,7 +109,7 @@ func NewAuthenticationProxy(serviceAccount gaefire.ServiceAccount, option gaefir
 func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Context, apiKey string) error {
 	// Api Keyが使用されているので、妥当性をチェックする
 	model := ServiceCheckModel{}
-	model.Operation.OperationId = appengine.RequestID(ctx)
+	model.Operation.OperationId = time.Now().Format(time.RFC3339Nano)
 	model.Operation.OperationName = "check:" + model.Operation.OperationId
 	model.Operation.ConsumerId = "api_key:" + apiKey
 	model.Operation.StartTime = time.Now().Format(time.RFC3339Nano)
@@ -123,11 +121,11 @@ func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Conte
 		//"https://www.googleapis.com/auth/service.management",
 		"https://www.googleapis.com/auth/servicecontrol")
 	if err != nil {
-		log.Errorf(ctx, "ServiceAccount token failed")
+		logError("ServiceAccount token failed")
 		return err
 	}
 
-	log.Debugf(ctx, "Endpoints[%v]", it.Option.EndpointsId)
+	logDebug(fmt.Sprintf("Endpoints[%v]", it.Option.EndpointsId))
 	var request *http.Request
 	if req, err := http.NewRequest("POST", "https://servicecontrol.googleapis.com/v1/services/"+it.Option.EndpointsId+":check", bytes.NewReader(buf)); err != nil {
 		return err
@@ -144,11 +142,11 @@ func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Conte
 
 	if err != nil || resp == nil || resp.StatusCode != 200 {
 		if resp != nil {
-			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode)
+			logError(fmt.Sprintf("User security service check error api_key[%v] token[%v] status[%v]", apiKey, accessToken.AccessToken, resp.StatusCode))
 		} else {
-			log.Errorf(ctx, "User security service check error api_key[%v] token[%v] status[nil]", apiKey, accessToken.AccessToken)
+			logError(fmt.Sprintf("User security service check error api_key[%v] token[%v] status[nil]", apiKey, accessToken.AccessToken))
 		}
-		log.Errorf(ctx, "  - post body[%v]", string(buf))
+		logError(fmt.Sprintf("  - post body[%v]", string(buf)))
 		return errors.New(http.StatusForbidden, "ApiKey check error")
 	}
 
@@ -162,7 +160,7 @@ func (it *AuthenticationProxyImpl) validApiKeyByServiceCtrlAPI(ctx context.Conte
 
 	if validModel.CheckErrors != nil && len(*validModel.CheckErrors) > 0 {
 		// エラーが発生している
-		log.Errorf(ctx, "User api_key check error error[%v]", (*validModel.CheckErrors)[0].Detail)
+		logError(fmt.Sprintf("User api_key check error error[%v]", (*validModel.CheckErrors)[0].Detail))
 		return errors.New(http.StatusForbidden, (*validModel.CheckErrors)[0].Detail)
 	}
 
@@ -193,16 +191,16 @@ func (it *AuthenticationProxyImpl) validApiKey(ctx context.Context, r *http.Requ
 	}
 
 	// Service-Control APIでAPIKeyの妥当性を確認する
-	// 期限切れは1分
-	// `1,000,000 quota units per 100 seconds` なので、十分に使用可能である。
+	// 期限切れは_APIKEY_CACHE_DURATION参照
+	// 1分以上であれば  `1,000,000 quota units per 100 seconds` なので、十分に使用可能である。
 	var loadedApiKey string
 	err := gaefire.NewMemcacheRequest(ctx).
-		SetKindInfo(_APIKEY_KIND_INFO).
+		SetKindInfo(apiKeyKindInfo).
 		SetId(apiKey).
-		SetExpireDate(time.Now().Add(_APIKEY_CACHE_DURATION)).
+		SetExpireDate(time.Now().Add(apiKeyCacheDuration)).
 		Load(&loadedApiKey,
 			func(ref interface{}) error {
-				log.Infof(ctx, "APIKey[%v] memcache not found", apiKey)
+				logInfo(fmt.Sprintf("APIKey[%v] memcache not found", apiKey))
 				return it.validApiKeyByServiceCtrlAPI(ctx, apiKey)
 			})
 
@@ -220,7 +218,7 @@ func (it *AuthenticationProxyImpl) validOAuth2(ctx context.Context, authorizatio
 	// OAuth2 Tokenである
 	token := gaefire.OAuth2Token{TokenType: "Bearer", AccessToken: authorization}
 	if !token.Valid(ctx) {
-		log.Errorf(ctx, "Invalid OAuth2 token[%v]", authorization)
+		logError(fmt.Sprintf("Invalid OAuth2 token[%v]", authorization))
 		return errors.New(http.StatusForbidden, "Invalid oauth2 token")
 	}
 
@@ -241,7 +239,7 @@ func (it *AuthenticationProxyImpl) validOAuth2(ctx context.Context, authorizatio
 	if !validAudience {
 		// 許可済のaudを見つけられなかった
 		// 恐らく、このトークンはこのプロジェクトのために用意されたものでは無いだろう
-		log.Errorf(ctx, "User OAuth2 check error aud[%v]", token.Audience)
+		logError(fmt.Sprintf("User OAuth2 check error aud[%v]", token.Audience))
 		return errors.New(http.StatusForbidden, "Not supported oauth2 aud :: "+token.Audience)
 	}
 
@@ -295,12 +293,12 @@ func (it *AuthenticationProxyImpl) validJsonWebToken(ctx context.Context, jwtStr
 			verifier.AddTrustedAudience("https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit")
 			serviceJwt = &jwtString
 		} else {
-			log.Errorf(ctx, "User JWT check error issuer[%v]", issuer)
+			logError(fmt.Sprintf("User JWT check error issuer[%v]", issuer))
 			return errors.New(http.StatusForbidden, "Issuer error")
 		}
 
 		if validToken, err := verifier.Valid(); err != nil {
-			log.Errorf(ctx, "User JWT check error err[%v]", err.Error())
+			logError(fmt.Sprintf("User JWT check error err[%v]", err.Error()))
 			return err
 		} else {
 			result.Issuer = &issuer
@@ -360,7 +358,7 @@ func (it *AuthenticationProxyImpl) Verify(ctx context.Context, r *http.Request) 
 		value := r.Header.Get(key)
 		// セキュリティ上許されないヘッダを見つけた
 		if len(value) > 0 {
-			log.Errorf(ctx, "User security header key[%v] vakue[%v]", key, value)
+			logError(fmt.Sprintf("User security header key[%v] vakue[%v]", key, value))
 			return nil, errors.New(http.StatusForbidden, fmt.Sprintf("SecurityValue %v", value))
 		}
 	}

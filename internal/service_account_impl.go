@@ -1,14 +1,13 @@
 package gaefire
 
 import (
+	"context"
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/eaglesakura/gaefire"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/log"
 	"time"
 )
 
@@ -59,24 +58,24 @@ func NewServiceAccount(jsonBuf []byte) gaefire.ServiceAccount {
 	result := &FirebaseServiceAccountImpl{}
 
 	if json.Unmarshal(jsonBuf, &result.rawServiceAccount) != nil {
-		panic(errors.New("Json parse failed"))
+		panic(errors.New("json parse failed"))
 	}
 
 	if privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(result.rawServiceAccount.PrivateKey)); err == nil {
 		result.privateKey = privateKey
 	} else {
-		panic(errors.New("Private key error"))
+		panic(errors.New("private key error"))
 	}
 
 	if keystore := NewPublicKeystore(GooglePublicKeystoreAccount); keystore != nil {
 		result.googlePublicKeys = keystore
 	} else {
-		panic(errors.New("Google Public key error"))
+		panic(errors.New("google public key error"))
 	}
 	if keystore := NewPublicKeystore(result.rawServiceAccount.ClientEmail); keystore != nil {
 		result.firebasePublicKeys = keystore
 	} else {
-		panic(errors.New("Firebase PUblic key error"))
+		panic(errors.New("firebase public key error"))
 	}
 	return result
 }
@@ -150,7 +149,7 @@ func (it *FirebaseServiceAccountImpl) FindPublicKey(ctx context.Context, kid str
 		return key, nil
 	}
 
-	log.Errorf(ctx, fmt.Sprintf("Not Found Keystore[%v]", kid))
+	logError(fmt.Sprintf("Not Found Keystore[%v]", kid))
 	return nil, errors.New(fmt.Sprintf("Not Found Keystore[%v]", kid))
 }
 

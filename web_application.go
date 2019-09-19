@@ -1,6 +1,6 @@
 package gaefire
 
-import "golang.org/x/net/context"
+import "context"
 
 /**
  * Firebase経由で生成されたWebアプリケーションの管理を行なう

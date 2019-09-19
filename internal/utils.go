@@ -1,11 +1,10 @@
 package gaefire
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"golang.org/x/net/context"
-	"google.golang.org/appengine/urlfetch"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -46,13 +45,8 @@ func GenMD5(text string) string {
 
 func newHttpClient(ctx context.Context) *http.Client {
 	// タイムアウトを30秒に延長
-	deadline, _ := context.WithTimeout(ctx, 30*time.Second)
-
 	result := &http.Client{
-		Transport: &urlfetch.Transport{
-			Context: deadline,
-		},
+		Timeout: 30 * time.Second,
 	}
-	result.Timeout = 30 * time.Second
 	return result
 }
