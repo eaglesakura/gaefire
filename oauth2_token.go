@@ -94,7 +94,7 @@ func (it *OAuth2Token) Valid(ctx context.Context) bool {
 	return true
 }
 
-func newHttpClient(ctx context.Context) *http.Client {
+func newHttpClient(_ context.Context) *http.Client {
 	// タイムアウトを30秒に延長
 	result := &http.Client{
 		Timeout: 30 * time.Second,

@@ -43,7 +43,7 @@ func GenMD5(text string) string {
 	return hex.EncodeToString(hash.Sum(nil))
 }
 
-func newHttpClient(ctx context.Context) *http.Client {
+func newHttpClient(_ context.Context) *http.Client {
 	// タイムアウトを30秒に延長
 	result := &http.Client{
 		Timeout: 30 * time.Second,

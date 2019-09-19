@@ -1,7 +1,6 @@
 package gaefire
 
 import (
-	"context"
 	"github.com/eaglesakura/gaefire"
 	"net/http"
 )
@@ -11,7 +10,7 @@ import (
  */
 func NewContext(request *http.Request) gaefire.Context {
 	result := &ContextImpl{
-		ctx: context.Background(),
+		ctx: request.Context(),
 	}
 
 	return result
